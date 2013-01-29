@@ -1,0 +1,49 @@
+######################
+# OS generated files #
+######################
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+ehthumbs.db
+Thumbs.db
+
+################################
+# Ignore third party libraries #
+################################
+tools/phing
+library/Directadmin/
+library/RedBean/
+library/SpikePHPCoverage/
+library/Zend
+
+#######################
+# Ignore test reports #
+#######################
+public/report/
+
+#######################
+# Ignore config files #
+#######################
+application/configs/config.xml
+
+#######################
+# Ignore buildscripts #
+#######################
+buildscripts/h5/
+buildscripts/pc/
+buildscripts/basic/
+buildscripts/basic.xml
+buildscripts/h5.xml
+buildscripts/pimcore.xml
+buildscripts/testscript.xml
+buildscripts/training.xml
+
+###########################
+# Ignore OUR server logic #
+###########################
+application/models/Server/Dev.php
+application/models/Server/Demo.php
+application/models/Server/Production.php
