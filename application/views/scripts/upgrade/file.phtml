@@ -1,0 +1,55 @@
+<?php
+//Set page title
+$this->headTitle('Files');
+
+// Get the base url, so our application does not need to be at the root location.
+$baseUrl = Zend_Controller_Front::getInstance()->getBaseUrl();
+
+// Append script at the end of the page, like it should
+$this->headScript()->appendFile($baseUrl . '/javascripts/index/requiredselect.js');
+?>
+<div class="row">
+	<div class="twelve columns">
+		<h4>Files</h4>
+		<p>The following <?php echo $this->escape($this->changeSet->getNumberOfFilesTransferred()) ?> file(s) will be updated by this deployment.</p>
+	</div>
+</div>
+<form method="POST" action="<?php echo $this->url(array('module' => 'default', 'controller' => 'upgrade', 'action' => 'file'), null, true); ?>">
+	<div class="row">
+		<div class="twelve columns">
+			<table class="twelve">
+				<thead>
+					<tr>
+						<th width="16px"><span class="has-tip tip-top" title="Select for deployment">#</span></th>
+						<th>File name</th>
+						<th>Full Path</th>
+					</tr>
+				</thead>
+				<tbody>
+					<?php foreach ($this->changeSet->getItemizeChangeset() as $id => $itemizeChange): ?>
+						<?php if ($itemizeChange->isTransferred()): ?>
+							<tr>
+								<td width="16px"><input type="checkbox" name="file[]" id="file-<?php echo $this->escape($id); ?>" value="<?php echo $this->escape($id); ?>" <?php echo (isset($this->file) && in_array($id, $this->file)) ? 'checked="checked"' : ''; ?>/></td>
+								<td><?php echo $this->escape($itemizeChange->getFileName()) ?></td>
+								<td><?php echo $this->escape($itemizeChange->getPath()) ?></td>
+							</tr>
+						<?php endif; ?>
+					<?php endforeach; ?>
+				</tbody>
+			</table>
+			<span class="has-tip tip-top" title="This will disable all rollback possibilities for this deployment&hellip;">
+				<label for="fileStrat">
+					<input id="fileStrat" name="fileStrat" value="nobackup" type="checkbox" /> Do NOT make any backups at all. This is just a tiny code-fix.
+				</label>
+			</span>
+		</div>
+	</div>
+	<div class="row nudgedown">
+		<div class="six columns" align="left">
+			<span class="has-tip tip-top" title="Review database schema changes"><a href="<?php echo $this->url(array('module' => 'default', 'controller' => 'upgrade', 'action' => 'database'), null, true); ?>" class="button">&Lt; Previous</a></span>
+		</div>
+		<div class="six columns" align="right">
+			<span class="has-tip tip-top" title="Begin deployment"><input type="submit" id="nextbutton" class="secondary disabled button" value="Start &Gt;" /></span>
+		</div>
+	</div>
+</form>

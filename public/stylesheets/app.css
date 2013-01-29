@@ -1,0 +1,53 @@
+.nudgedown {
+	margin-top: 10px;
+}
+
+footer p {
+	font-size: 75%;
+}
+
+div .pre {
+	display: block;
+	font-family: monospace;
+	white-space: pre-wrap;
+	margin: 1em 0;
+}
+select {
+	font-size: 105%;
+}
+div.progress {
+	padding-top: 2px;
+	padding-bottom: 2px;
+	padding-left: 0px;
+	padding-right: 0px;
+	margin-bottom: 10px;
+	border-top: 1px solid #cccccc;
+	height: 20px;
+}
+div.progress .animeter {
+	height: 100%;
+	display: block;
+	width: 50%;
+	background-image: url('/images/static.gif');
+	background-repeat: repeat-x;
+	background-position: top left;
+}
+div.progress .activeanimeter {
+	height: 100%;
+	display: block;
+	width: 50%;
+	background-image: url('/images/ani.gif');
+	background-repeat: repeat-x;
+	background-position: top left;
+}
+table tbody tr.odd { background: #fff; }
+
+/* Breadcrums ---------------------- */
+ul.linearpath { display: block; background: #f6f6f6; padding: 6px 10px 7px; border: 1px solid #e9e9e9; -webkit-border-radius: 2px; -moz-border-radius: 2px; -ms-border-radius: 2px; -o-border-radius: 2px; border-radius: 2px; overflow: hidden; }
+ul.linearpath li { margin: 0; padding: 0 12px 0 0; float: left; list-style: none; }
+ul.linearpath li span { text-transform: uppercase; font-size: 11px; font-size: 1.1rem; padding-left: 12px;  color:#2BA6CB; line-height: inherit; }
+ul.linearpath li:first-child span { padding-left: 0; }
+ul.linearpath li:before { content :'\226B'; color: #aaa; }
+ul.linearpath li:first-child:before { content: " "; }
+ul.linearpath li.current span { color: #333; }
+ul.linearpath li.unavailable span { color: #999; }

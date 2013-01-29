@@ -1,0 +1,38 @@
+<?php
+//Set page title
+$this->headTitle('Rollback');
+// Get the base url, so our application does not need to be at the root location.
+$baseUrl = Zend_Controller_Front::getInstance()->getBaseUrl();
+
+// Append script at the end of the page, like it should
+$this->headScript()->appendFile($baseUrl . '/javascripts/index/requiredselect.js');
+?>
+<div class="row">
+	<div class="twelve columns">
+		<h4>Rollback</h4>
+		<p>About to undo deployment: <?php echo $this->escape($this->deployment->getDescription()); ?> - <?php echo $this->escape($this->deployment->unbox()->created) ?></p>
+<?php if ($this->dbChanged): ?>
+			<p>This deployment has changed the database schema.</p>
+<?php endif; ?>
+	</div>
+</div>
+<form method="POST" action="<?php echo $this->url(array('module' => 'default', 'controller' => 'rollback', 'action' => 'rollback'), null, true); ?>">
+	<div class="row">
+		<div class="twelve columns">
+			<select id="requiredSelect" name="dbStrategy" <?php echo (isset($this->errors['dbStrategy'])) ? ' class="error"' : ''; ?>>
+				<option value="">Select a database rollback strategy&hellip;</option>
+				<?php foreach ($this->dbStrategies as $value => $dbStrategy): ?>
+					<option <?php echo ($value == $this->dbStrategy) ? 'selected="selected" ' : ''; ?>value="<?php echo $this->escape($value); ?>"><?php echo $this->escape($dbStrategy); ?></option>
+				<?php endforeach; ?>
+			</select>
+		</div>
+	</div>
+	<div class="row nudgedown">
+		<div class="six columns" align="left">
+			<span class="has-tip tip-top" title="Select a different deployment"><a href="<?php echo $this->url(array('module' => 'default', 'controller' => 'rollback', 'action' => 'history'), null, true); ?>" class="button">&Lt; Back</a></span>
+		</div>
+		<div class="six columns" align="right">
+			<span class="has-tip tip-top" title="Begin Rollback"><input type="submit" id="nextbutton" class="button" value="Start &Gt;" /></span>
+		</div>
+	</div>
+</form>

@@ -1,0 +1,62 @@
+<?php
+//Set page title
+$this->headTitle('Recipe');
+
+// Get the base url, so our application does not need to be at the root location.
+$baseUrl = Zend_Controller_Front::getInstance()->getBaseUrl();
+
+// Append script at the end of the page, like it should
+$this->headScript()->appendFile($baseUrl . '/javascripts/index/requiredcheckbox.js');
+?>
+<div class="row">
+	<div class="twelve columns">
+		<h4>Recipe</h4>
+		<p>Please read the recipe notice. These are a couple of notes attached to the recipe by the author. Please confirm you have read these notices before proceeding.</p>
+	</div>
+</div>
+<div class="row">
+  <div class="twelve columns">
+		<h6><strong>Name:</strong></h6><p><?php echo $this->escape($this->recipe->getName()); ?></p>
+  </div>
+</div>
+<div class="row">
+	<div class="six columns">
+		<h6><strong>Author:</strong></h6><p><?php echo $this->escape($this->recipe->getAuthor()); ?></p>
+  </div>
+	<div class="six columns">
+		<h6><strong>Version:</strong></h6><p><?php echo $this->escape($this->recipe->getVersion()); ?> (API: <?php echo $this->escape($this->recipe->getApiVersion()); ?>)</p>
+  </div>
+</div>
+<div class="row">
+	<div class="twelve columns">
+		<h6><strong>Deployment Types:</strong></h6>
+		<ul>
+			<?php foreach ($this->recipe->getTargets() as $deploymentType): ?>
+			<li><?php echo $this->escape(str_replace('_', ' ', $deploymentType)); ?></li>
+			<?php endforeach; ?>
+		</ul>
+  </div>
+</div>
+<div class="row">
+	<div class="twelve columns">
+		<h6><strong>Limitations and notes:</strong></h6>
+		<p><?php echo str_replace(PHP_EOL, '<br />', $this->escape($this->recipe->getNote())); ?></p>
+  </div>
+</div>
+<div class="row">
+	<div class="twelve columns">
+		<form>
+			<label for="required">
+				<input id="required" name="Agree" value="agree" type="checkbox" /> I have read this notice.
+			</label>
+		</form>
+	</div>
+</div>
+<div class="row nudgedown">
+	<div class="six columns" align="left">
+		<span class="has-tip tip-top" title="Abort deployment, nothing will be done"><a href="<?php echo $this->url(array('module' => 'default', 'controller' => 'index', 'action' => 'index'), null, true); ?>" class="button">&Lt; Cancel</a></span>
+	</div>
+	<div class="six columns" align="right">
+		<span class="has-tip tip-top" title="Proceed to Application selection"><a href="<?php echo $this->url(array('module' => 'default', 'controller' => 'index', 'action' => 'application'), null, true); ?>" id="nextbutton" class="secondary disabled button">Next &Gt;</a></span>
+	</div>
+</div>

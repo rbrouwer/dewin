@@ -1,0 +1,24 @@
+body {
+	background-color:#000;
+	color:#FFF;
+}
+.stdin {
+	background-color:#000000;
+	border:0 none;
+	color:#FFFFFF;
+	font-family:inherit;
+	font-size:12px;
+	line-height:inherit;
+	margin:0;
+	outline-style:none;
+	outline-width:0;
+	padding:0;
+	width:100%;
+}
+p{ margin:0;}
+label {
+	position:absolute;
+	right:0; left:200;
+}
+tt {font-weight: bold}
+

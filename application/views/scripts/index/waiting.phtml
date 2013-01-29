@@ -1,0 +1,64 @@
+<?php
+//Set page title
+$this->headTitle($this->title);
+
+// Get the base url, so our application does not need to be at the root location.
+$baseUrl = Zend_Controller_Front::getInstance()->getBaseUrl();
+
+// Append script at the end of the page, like it should
+$this->headScript()->appendScript('callbackUrl = "'.$this->callbackUrl.'";', 'text/javascript', array('noescape' => true));
+$this->headScript()->appendScript('failUrl = "'.$this->failUrl.'";', 'text/javascript', array('noescape' => true));
+$this->headScript()->appendScript('successUrl = "'.$this->successUrl.'";', 'text/javascript', array('noescape' => true));
+$this->headScript()->appendScript('defaultProcessText = "'.$this->defaultProcessText.'";', 'text/javascript', array('noescape' => true));
+$this->headScript()->appendScript('debugMode = "'.$this->debugMode.'";', 'text/javascript', array('noescape' => true));
+$this->headScript()->appendFile($baseUrl . '/javascripts/index/progress.js');
+?>
+<div class="row">
+	<div class="twelve columns">
+		<h4><?php echo $this->escape($this->title); ?>&hellip;</h4>
+		<p><?php echo $this->escape($this->text); ?></p>
+	</div>
+</div>
+<div class="row">
+	<div class="twelve columns">
+		<div class="progress twelve"><span id="progressbar" class="animeter" style="width: 0%"></span></div>
+		<p id="progresstext"><?php echo $this->escape($this->initialProgressText); ?>&hellip;</p>
+		<p>Toggle the <span class="showInformation" style="color:#2BA6CB; cursor: pointer;">details</span></p>
+	</div>
+</div>
+<div class="row information" <?php echo ($this->debugMode == 0) ? 'style="display: none;"' : ''; ?>>
+	<div class="twelve columns">
+		<h5>Details</h5>
+	</div>
+</div>
+<div class="row information" <?php echo ($this->debugMode == 0) ? 'style="display: none;"' : ''; ?>>
+	<div class="twelve columns pre" id="console" style="overflow-y: scroll; height: 350px; resize: vertical">
+	</div>
+</div>
+<?php if ($this->debugMode > 0): ?>
+<?php
+$url = Zend_Controller_Front::getInstance()->getRequest()->getRequestUri();
+?>
+<form method="POST" action="<?php echo $this->escape($url); ?>">
+	<div class="row nudgedown">
+		<div class="four columns" align="left">
+			<span class="has-tip tip-top" title="Sorry, a process cannot be stopped."><a class="secondary disabled button">&Lt; STOP!</a></span>
+		</div>
+		<div class="four columns" align="center">
+			<span class="has-tip tip-top" title="Debug mode."><input id="debugButton" type="submit" name="restart" class="secondary disabled button" value="Restart" /></span>
+		</div>
+		<div class="four columns" align="right" id="nextButton">
+			<span class="has-tip tip-top" title="Have patience, young padawan&hellip;"><a id="nextbutton" class="secondary disabled button">Next &Gt;</a></span>
+		</div>
+	</div>
+</form>
+<?php else: ?>
+<div class="row nudgedown">
+	<div class="six columns" align="left">
+		<span class="has-tip tip-top" title="Sorry, a process cannot be stopped."><a class="secondary disabled button">&Lt; STOP!</a></span>
+	</div>
+	<div class="six columns" align="right">
+		<span class="has-tip tip-top" title="Have patience, young padawan&hellip;"><a id="nextbutton" class="secondary disabled button">Next &Gt;</a></span>
+	</div>
+</div>
+<?php endif; ?>

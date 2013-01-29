@@ -1,0 +1,32 @@
+<!--
+@author TestAuthor
+@version 9665664645535345654.0
+@note Note line 1
+Note line 2
+@requiresDir dir1
+@requiresDir dir2
+@requiresFile file1
+@requiresFile file2
+-->
+<project name="TestName" basedir="." default="__requiresTarget">
+	<property file="build.properties" />
+
+	<target name="__requiresTarget" description="t0">
+		<fail message="This deployment script requires a target." />
+	</target>
+
+	<target name="Deploy" description="t1">
+	</target>
+
+	<target name="UpgradePilot" description="t2">
+	</target>
+
+	<target name="Upgrade" description="t3">
+	</target>
+
+	<target name="RollbackPilot" description="t4">
+	</target>
+
+	<target name="Rollback" description="t5">
+	</target>
+</project>

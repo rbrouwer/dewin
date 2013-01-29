@@ -1,0 +1,42 @@
+<?php
+//Set page title
+$this->headTitle('Application');
+
+// Get the base url, so our application does not need to be at the root location.
+$baseUrl = Zend_Controller_Front::getInstance()->getBaseUrl();
+
+// Append script at the end of the page, like it should
+$this->headScript()->appendFile($baseUrl . '/javascripts/index/requiredselect.js');
+?>
+<div class="row">
+	<div class="twelve columns">
+		<h4>Application</h4>
+		<p>Select the application you wish to deploy</p>
+		<p>Here you see all applications found on the development server that can be deployed by the selected recipe.</p>
+	</div>
+</div>
+<form method="POST" action="<?php echo $this->url(array('module' => 'default', 'controller' => 'index', 'action' => 'application'), null, true); ?>">
+	<div class="row">
+		<div class="twelve columns">
+			<label>Application</label>
+			<select id="required" name="application" class="twelve columns">
+				<option value="">Select an application&hellip;</option>
+				<?php foreach ($this->applications as $dev => $applications): ?>
+					<optgroup label="<?php echo $this->escape($dev); ?>">
+						<?php foreach ($applications as $application): ?>
+						<option <?php echo ($application->path == $this->selectedPath) ? 'selected="selected" ' : '' ;?>value="<?php echo $this->escape($application->path); ?>"><?php echo $this->escape($application->getName()); ?></option>
+						<?php endforeach; ?>
+					</optgroup>
+				<?php endforeach; ?>
+			</select>
+		</div>
+	</div>
+	<div class="row nudgedown">
+		<div class="six columns" align="left">
+			<span class="has-tip tip-top" title="Re-read notices"><a href="<?php echo $this->url(array('module' => 'default', 'controller' => 'index', 'action' => 'recipe'), null, true); ?>" class="button">&Lt; Cancel</a></span>
+		</div>
+		<div class="six columns" align="right">
+			<span class="has-tip tip-top" title="Proceed to target selection"><input type="submit" id="nextbutton" class="secondary disabled button" value="Next &Gt;" /></span>
+		</div>
+	</div>
+</form>

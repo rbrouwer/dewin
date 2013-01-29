@@ -1,0 +1,18 @@
+<?php
+//Set page title
+$this->headTitle('Finished');
+?>
+<div class="row">
+	<div class="twelve columns">
+		<h4>Finished&hellip;</h4>
+		<p>The application has been deployed</p>
+	</div>
+</div>
+
+<form method="POST" action="<?php echo $this->url(array('module' => 'default', 'controller' => 'setup', 'action' => 'complete'), null, true); ?>">
+	<div class="row nudgedown">
+		<div class="twelve columns" align="right">
+			<span class="has-tip tip-top" title="Go home"><input type="submit" id="nextbutton" class="button" value="Finish Deployment" /></span>
+		</div>
+	</div>
+</form>

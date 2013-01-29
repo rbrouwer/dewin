@@ -1,0 +1,24 @@
+<form method="POST">
+	<div class="row">
+		<div class="six columns centered">
+			<h4>Login</h4>
+			<?php foreach ($this->errors as $error):?>
+			<div class="alert-box alert">
+				<?php echo $this->escape($error); ?>
+			</div>
+			<?php endforeach; ?>
+			<label>Username</label>
+			<input name="authUsername" type="text" placeholder="Your username" />
+			<label>Password</label>
+			<input name="authPassword" type="password" placeholder="Your password" />
+			<div class="row">
+				<div class="six columns" align="left">
+					<input type="reset" class="button" value="Clear" />	
+				</div>
+				<div class="six columns" align="right">
+					<input type="submit" class="button" value="Login &Gt;" />	
+				</div>
+			</div>
+		</div>
+	</div>
+</form>

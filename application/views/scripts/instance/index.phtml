@@ -1,0 +1,42 @@
+<?php
+//Set page title
+$this->headTitle('Instances');
+// Get the base url, so our application does not need to be at the root location.
+$baseUrl = Zend_Controller_Front::getInstance()->getBaseUrl();
+?>
+<div class="row">
+	<div class="twelve columns">
+		<h4>Instances</h4>
+		<p>Listed below are all instance.</p>
+	</div>
+</div>
+<div class="row">
+	<div class="twelve columns">
+		<table class="twelve">
+			<thead>
+				<tr>
+					<th>Description</th>
+					<th>Target URL</th>
+					<!--th style="text-align: right;" width="60">Actions</th-->
+				</tr>
+			</thead>
+			<tbody>
+				<?php foreach ($this->instances as $instance): ?>
+					<tr>
+						<td><?php echo $this->escape($instance->application->getName()); ?></td>
+						<td><?php echo $this->escape($instance->box()->url); ?></td>
+						<!--td style="text-align: right;" width="60">
+							<a href="<?php echo $this->url(array('module' => 'default', 'controller' => 'instance', 'action' => 'edit', 'id' => $instance->id), null, false); ?>"><img src="<?php echo $baseUrl; ?>/images/pencil.png" alt="[Edit]"/></a>
+							<a href="<?php echo $this->url(array('module' => 'default', 'controller' => 'instance', 'action' => 'remove', 'id' => $instance->id), null, false); ?>"><img src="<?php echo $baseUrl; ?>/images/cross.png" alt="[Delete]"/></a>
+						</td-->
+					</tr>
+				<?php endforeach; ?>
+			</tbody>
+		</table>
+	</div>
+</div>
+<div class="row nudgedown">
+	<div class="twelve centered columns" align="center">
+		<span class="has-tip tip-top" title="Add an instance manually."><a href="<?php echo $this->url(array('module' => 'default', 'controller' => 'instance', 'action' => 'add'), null, false); ?>" class="button">New</a></span>
+	</div>
+</div>

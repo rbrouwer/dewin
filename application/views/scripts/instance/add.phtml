@@ -1,0 +1,80 @@
+<?php
+//Set page title
+$this->headTitle('Target');
+
+// Get the base url, so our application does not need to be at the root location.
+$baseUrl = Zend_Controller_Front::getInstance()->getBaseUrl();
+
+// Append script at the end of the page, like it should
+$this->headScript()->appendScript('callbackurl = "' . $this->callbackurl . '";', 'text/javascript', array('noescape' => true));
+$this->headScript()->appendFile($baseUrl . '/javascripts/instance/add.js');
+?>
+<div class="row">
+	<div class="twelve columns">
+		<h4>Create Instance</h4>
+		<p>Using the form below you can manually add an instance. After the creation of an instance you can create snapshots and do quick updates.</p>
+	</div>
+</div>
+<form method="POST" action="<?php echo $this->url(array('module' => 'default', 'controller' => 'instance', 'action' => 'add'), null, true); ?>" id="targetForm">
+	<div class="row">
+		<div class="six columns centered">
+			<label>Recipe</label>
+			<select id="required" name="recipe" class="twelve columns">
+				<option value="">Select a recipe&hellip;</option>
+				<?php foreach ($this->recipes as $recipe): ?>
+					<option <?php echo ($recipe->getPath() == $this->recipePath) ? 'selected="selected" ' : '' ;?>value="<?php echo $this->escape($recipe->getFileName()); ?>"><?php echo $this->escape($recipe->getName()); ?></option>
+				<?php endforeach; ?>
+			</select>
+			<br /><br />
+			<?php if (isset($this->errors['recipe'])): ?>
+				<small class="error" id="recipeError"><?php echo $this->escape($this->errors['recipe']); ?></small>
+			<?php endif; ?>
+			<label>Application</label>
+			<select id="required" name="application" class="twelve columns">
+				<option value="">Select an application&hellip;</option>
+				<?php foreach ($this->applications as $dev => $applications): ?>
+					<optgroup label="<?php echo $this->escape($dev); ?>">
+						<?php foreach ($applications as $application): ?>
+						<option data="<?php echo $this->escape($application->getProjectName()); ?>" <?php echo ($application->path == $this->selectedPath) ? 'selected="selected" ' : '' ;?>value="<?php echo $this->escape($application->path); ?>"><?php echo $this->escape($application->getName()); ?></option>
+						<?php endforeach; ?>
+					</optgroup>
+				<?php endforeach; ?>
+			</select>
+			<br /><br />
+			<?php if (isset($this->errors['application'])): ?>
+				<small class="error" id="applicationError"><?php echo $this->escape($this->errors['application']); ?></small>
+			<?php endif; ?>
+			<label>Server</label>
+			<select name="serverId" <?php echo (isset($this->errors['serverId'])) ? ' class="error"' : ''; ?>>
+				<option value="">Select a server&hellip;</option>
+				<?php foreach ($this->servers as $server): ?>
+					<option data="<?php echo $this->escape($server->baseurl); ?>" <?php echo ($server->id == $this->server_id) ? 'selected="selected" ' : ''; ?>value="<?php echo $this->escape($server->id); ?>"><?php echo $this->escape($server->name); ?></option>
+				<?php endforeach; ?>
+			</select>
+			<br /><br />
+			<?php if (isset($this->errors['serverId'])): ?>
+				<small class="error" id="serverIdError"><?php echo $this->escape($this->errors['serverId']); ?></small>
+			<?php endif; ?>
+			<label>URL</label>
+			<input type="text" name="url" placeholder="URL"<?php echo ($this->url) ? ' value="' . $this->escape($this->url) . '"' : ''; ?> <?php echo (isset($this->errors['url'])) ? ' class="error"' : ''; ?> />
+			<?php if (isset($this->errors['url'])): ?>
+				<small class="error" id="urlError"><?php echo $this->escape($this->errors['url']); ?></small>
+			<?php endif; ?>
+		</div>
+	</div>
+	<div class="row">
+		<div class="six columns centered" id="customTargetForm">
+		</div>
+	</div>
+	<div class="row" style="margin-top:60px;">
+		<div class="five columns" align="left">
+			<a href="<?php echo $this->url(array('module' => 'default', 'controller' => 'instance', 'action' => 'index'), null, true); ?>" class="button">Cancel</a>
+		</div>
+		<div class="two columns" align="center">
+			<span class="has-tip tip-top" title="Validate form"><button type="button" id="test" class="button">Validate</button></span>
+		</div>
+		<div class="five columns" align="right">
+			<span class="has-tip tip-top" title="Create instance"><input type="submit" id="nextbutton" class="secondary disabled button" value="Create" /></span>
+		</div>
+	</div>
+</form>

@@ -1,0 +1,52 @@
+<?php
+//Set page title
+$this->headTitle('History');
+// Get the base url, so our application does not need to be at the root location.
+$baseUrl = Zend_Controller_Front::getInstance()->getBaseUrl();
+
+// Append script at the end of the page, like it should
+$this->headScript()->appendFile($baseUrl . '/javascripts/index/requiredradio.js');
+?>
+<div class="row">
+	<div class="twelve columns">
+		<h4>History</h4>
+		<p>Pick a deployment to roll back</p>
+	</div>
+</div>
+<form method="POST" action="<?php echo $this->url(array('module' => 'default', 'controller' => 'instance', 'action' => 'index'), null, true); ?>">
+	<div class="row">
+		<div class="twelve columns">
+			<table class="twelve">
+				<thead>
+					<tr>
+						<th width="20px" align="center"><span class="has-tip tip-top" title="Select for action">#</span></th>
+						<th>Description</th>
+						<th>Target URL</th>
+						<th>Date</th>
+					</tr>
+				</thead>
+				<tbody>
+					<?php foreach ($this->deployments as $deployment): ?>
+						<tr>
+							<?php $beginStrikethrough = (!$deployment->canRollback()) ? '<del>' : ''; ?>
+							<?php $endStrikethrough = (!$deployment->canRollback()) ? '</del>' : ''; ?>
+							<td><input class="required" name="deployment"<?php echo (!$deployment->canRollback()) ? ' disabled="disabled"' : ''; ?> value="<?php echo $this->escape($deployment->id); ?>" type="radio" id="deployment-<?php echo $this->escape($deployment->id); ?>" /></td>
+							<td><?php echo $beginStrikethrough.$this->escape($deployment->type).$endStrikethrough; ?></td>
+							<td><?php echo $beginStrikethrough.$this->escape($deployment->box()->remoteUrl).$endStrikethrough;?></td>
+							<td><?php echo $beginStrikethrough.$this->escape($deployment->created).$endStrikethrough; ?></td>
+						</tr>
+<?php endforeach; ?>
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	<div class="row nudgedown">
+		<div class="six columns" align="left">
+			<!--a href="#" class="disabled button">&Lt; Back</a-->
+		</div>
+		<div class="six columns" align="right">
+			<span class="has-tip tip-top" title="Rollback the selected deployment"><input type="submit" id="nextbutton" class="button" value="Rollback &Gt;" /></span>
+		</div>
+	</div>
+</form>

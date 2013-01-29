@@ -1,0 +1,97 @@
+<div class="row">
+	<div class="six columns centered">
+		<h4>Setup</h4>
+		<p>This setup will install the dependencies for Dewin and do the initial configuration.</p>
+		<?php if (isset($this->errors['general'])): ?>
+		<?php foreach($this->errors['general'] as $error): ?>
+			<small class="error general"><?php echo $this->escape($error); ?></small>
+		<?php endforeach; ?>
+		<?php endif; ?>
+	</div>
+</div>
+<form method="POST" action="<?php echo $this->url(array('module' => 'default', 'controller' => 'setup', 'action' => 'index'), null, true); ?>" id="targetForm">
+	<div class="row">
+		<div class="six columns centered">
+			<h5>Database</h5>
+			<p>This section is required to setup the database of this tool. The database should be protected as it may contain sensitive information about deployments this tool has performed.</p>
+		</div>
+	</div>
+	<div class="row">
+		<div class="six columns centered">
+			<?php if (isset($this->errors['database'])): ?>
+				<small class="error" id="database"><?php echo $this->escape($this->errors['database']); ?></small>
+			<?php endif; ?>
+			<label>Database host</label>
+			<input type="text" name="databaseHost" placeholder="localhost"<?php echo ($this->databaseHost) ? ' value="' . $this->escape($this->databaseHost) . '"' : ''; ?> <?php echo (isset($this->errors['databaseHost']) || isset($this->errors['database'])) ? ' class="error"' : ''; ?> />
+			<?php if (isset($this->errors['databaseHost'])): ?>
+				<small class="error" id="databaseHost"><?php echo $this->escape($this->errors['databaseHost']); ?></small>
+			<?php endif; ?>
+			<label>Database name</label>
+			<input type="text" name="databaseName" placeholder="dewin"<?php echo ($this->databaseName) ? ' value="' . $this->escape($this->databaseName) . '"' : ''; ?> <?php echo (isset($this->errors['databaseName']) || isset($this->errors['database'])) ? ' class="error"' : ''; ?> />
+			<?php if (isset($this->errors['databaseName'])): ?>
+				<small class="error" id="databaseName"><?php echo $this->escape($this->errors['databaseName']); ?></small>
+			<?php endif; ?>
+			<label>Database user</label>
+			<input type="text" name="databaseUser" placeholder="dewin"<?php echo ($this->databaseUser) ? ' value="' . $this->escape($this->databaseUser) . '"' : ''; ?> <?php echo (isset($this->errors['databaseUser']) || isset($this->errors['database'])) ? ' class="error"' : ''; ?> />
+			<?php if (isset($this->errors['databaseUser'])): ?>
+				<small class="error" id="databaseUser"><?php echo $this->escape($this->errors['databaseUser']); ?></small>
+			<?php endif; ?>
+			<label>Database password</label>
+			<input type="password" name="databasePassword" placeholder="Your password"<?php echo ($this->databasePassword) ? ' value="' . $this->escape($this->databasePassword) . '"' : ''; ?> <?php echo (isset($this->errors['databasePassword']) || isset($this->errors['database'])) ? ' class="error"' : ''; ?> />
+			<?php if (isset($this->errors['databasePassword'])): ?>
+				<small class="error" id="databasePassword"><?php echo $this->escape($this->errors['databasePassword']); ?></small>
+			<?php endif; ?>
+		</div>
+	</div>
+	<div class="row">
+		<div class="six columns centered">
+			<h5>Authentication</h5>
+			<p>This section will set up the account required to use Dewin.</p>
+		</div>
+	</div>
+	<div class="row">
+		<div class="six columns centered">
+			<label>Username</label>
+			<input type="text" name="username" placeholder="admin"<?php echo ($this->username) ? ' value="' . $this->escape($this->username) . '"' : ''; ?> <?php echo (isset($this->errors['username'])) ? ' class="error"' : ''; ?> />
+			<?php if (isset($this->errors['username'])): ?>
+				<small class="error" id="username"><?php echo $this->escape($this->errors['username']); ?></small>
+			<?php endif; ?>
+			<label>Password</label>
+			<input type="password" name="password" placeholder="Some secure password"<?php echo ($this->password) ? ' value="' . $this->escape($this->password) . '"' : ''; ?> <?php echo (isset($this->errors['password'])) ? ' class="error"' : ''; ?> />
+			<?php if (isset($this->errors['password'])): ?>
+				<small class="error" id="password"><?php echo $this->escape($this->errors['password']); ?></small>
+			<?php endif; ?>
+			<label>Confirm Password</label>
+			<input type="password" name="password2" placeholder="Some secure password"<?php echo ($this->password2) ? ' value="' . $this->escape($this->password2) . '"' : ''; ?> <?php echo (isset($this->errors['password2'])) ? ' class="error"' : ''; ?> />
+			<?php if (isset($this->errors['password2'])): ?>
+				<small class="error" id="password"><?php echo $this->escape($this->errors['password2']); ?></small>
+			<?php endif; ?>
+		</div>
+	</div>
+	<div class="row">
+		<div class="six columns centered">
+			<h5>Paths</h5>
+			<p>This section will set up the account required to use Dewin.</p>
+		</div>
+	</div>
+	<div class="row">
+		<div class="six columns centered">
+			<label>Path to buildscripts.</label>
+			<input type="text" name="buildscriptPath" placeholder="../buildscripts/"<?php echo ($this->buildscriptPath) ? ' value="' . $this->escape($this->buildscriptPath) . '"' : ''; ?> <?php echo (isset($this->errors['buildscriptPath'])) ? ' class="error"' : ''; ?> />
+			<?php if (isset($this->errors['buildscriptPath'])): ?>
+				<small class="error" id="buildscriptPath"><?php echo $this->escape($this->errors['buildscriptPath']); ?></small>
+			<?php endif; ?>
+			<label>Path to temporary folder.</label>
+			<input type="text" name="deploymentPath" placeholder="/tmp/dewin/"<?php echo ($this->deploymentPath) ? ' value="' . $this->escape($this->deploymentPath) . '"' : ''; ?> <?php echo (isset($this->errors['deploymentPath'])) ? ' class="error"' : ''; ?> />
+			<?php if (isset($this->errors['deploymentPath'])): ?>
+				<small class="error" id="deploymentPath"><?php echo $this->escape($this->errors['deploymentPath']); ?></small>
+			<?php endif; ?>
+		</div>
+	</div>
+	
+	<div class="row" style="margin-top:60px;">
+		<div class="four columns centered" align="center">
+			<span class="has-tip tip-top" title="Makes Dewin work, hopefully"><input type="submit" id="nextbutton" class="button" value="Install" /></span>
+		</div>
+	</div>
+</form>

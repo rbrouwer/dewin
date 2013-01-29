@@ -1,0 +1,60 @@
+<?php
+//Set page title
+$this->headTitle('Target');
+
+// Get the base url, so our application does not need to be at the root location.
+$baseUrl = Zend_Controller_Front::getInstance()->getBaseUrl();
+
+// Append script at the end of the page, like it should
+$this->headScript()->appendScript('sourceProject = "' . $this->escape($this->source_project) . '";', 'text/javascript', array('noescape' => true));
+$this->headScript()->appendScript('callbackurl = "' . $this->callbackUrl . '";', 'text/javascript', array('noescape' => true));
+$this->headScript()->appendFile($baseUrl . '/javascripts/index/target2.js');
+?>
+<div class="row">
+	<div class="twelve columns">
+		<h4>Target</h4>
+		<p>Select the target you wish to deploy to. For more information click <span class="showInformation" style="color:#2BA6CB; cursor: pointer;">here</span>.</p>
+	</div>
+</div>
+<div class="row">
+	<div class="twelve columns" style="display:none;" id="information">
+		<p>The Desired URL and the selected target will be used to form a project name. This project name is used in the document root path, database name and database user.</p>
+	</div>
+</div>
+<form method="POST" action="<?php echo $this->url(array('module' => 'default', 'controller' => 'index', 'action' => 'target'), null, true); ?>" id="targetForm">
+	<div class="row">
+		<div class="six columns centered">
+			<label>Target server</label>
+			<select name="serverId" <?php echo (isset($this->errors['serverId'])) ? ' class="error"' : ''; ?>>
+				<option value="">Select a target server&hellip;</option>
+				<?php foreach ($this->servers as $server): ?>
+					<option data="<?php echo $this->escape($server->baseurl); ?>" <?php echo ($server->id == $this->server_id) ? 'selected="selected" ' : ''; ?>value="<?php echo $this->escape($server->id); ?>"><?php echo $this->escape($server->name); ?></option>
+				<?php endforeach; ?>
+			</select>
+			<br /><br />
+			<?php if (isset($this->errors['serverId'])): ?>
+				<small class="error" id="errorTargetId"><?php echo $this->escape($this->errors['serverId']); ?></small>
+			<?php endif; ?>
+			<label>Desired URL</label>
+			<input type="text" name="url" placeholder="Desired URL"<?php echo ($this->url) ? ' value="' . $this->escape($this->url) . '"' : ''; ?> <?php echo (isset($this->errors['url'])) ? ' class="error"' : ''; ?> />
+			<?php if (isset($this->errors['url'])): ?>
+				<small class="error" id="errorUrl"><?php echo $this->escape($this->errors['url']); ?></small>
+			<?php endif; ?>
+		</div>
+	</div>
+	<div class="row">
+		<div class="six columns centered" id="customTargetForm">
+		</div>
+	</div>
+	<div class="row" style="margin-top:60px;">
+		<div class="five columns" align="left">
+			<span class="has-tip tip-top" title="Select different application"><a href="<?php echo $this->url(array('module' => 'default', 'controller' => 'index', 'action' => 'application'), null, true); ?>" class="button">&Lt; Cancel</a></span>
+		</div>
+		<div class="two columns" align="center">
+			<span class="has-tip tip-top" title="Validate form and test database connection"><button type="button" id="test" class="button">Test</button></span>
+		</div>
+		<div class="five columns" align="right">
+			<span class="has-tip tip-top" title="Proceed to detection phase"><input type="submit" id="nextbutton" class="secondary disabled button" value="Next &Gt;" /></span>
+		</div>
+	</div>
+</form>

@@ -1,0 +1,25 @@
+<?php
+//Prepend title
+$this->headTitle()->setSeparator(' - ');
+$this->headTitle('Dewin', 'PREPEND');
+
+// Get the base url, so our application does not need to be at the root location.
+$baseUrl = Zend_Controller_Front::getInstance()->getBaseUrl();
+
+$this->headScript()->prependFile($baseUrl . '/javascripts/jquery.js');
+
+// Content type and other meta header here...
+$this->headMeta()->prependHttpEquiv('Content-Type', 'text/html; charset=UTF-8');
+?>
+
+<html>
+	<head>
+		<?php echo $this->headTitle() ?>
+		<?php echo $this->headMeta(); ?>
+		<?php echo $this->headLink(); ?>
+	</head>
+	<body>
+		<?php echo $this->layout()->content; ?>
+		<?php echo $this->headScript(); ?>
+	</body>
+</html>

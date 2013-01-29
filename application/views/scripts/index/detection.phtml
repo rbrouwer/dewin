@@ -1,0 +1,53 @@
+<?php
+//Set page title
+$this->headTitle('Deployment Type');
+
+// Get the base url, so our application does not need to be at the root location.
+$baseUrl = Zend_Controller_Front::getInstance()->getBaseUrl();
+
+// Append script at the end of the page, like it should
+//$this->headScript()->appendFile($baseUrl . '/javascripts/index/requiredselect.js');
+?>
+<div class="row">
+	<div class="twelve columns">
+		<?php if ($this->warnings): ?>
+		<?php foreach ($this->warnings as $warning): ?>
+		<div class="alert-box alert">
+			<?php echo $this->escape($warning); ?>
+			<a href="" class="close">&times;</a>
+		</div>
+		<?php endforeach; ?>
+		<?php endif; ?>
+		<h4>Deployment Type</h4>
+		<p>We will now determine the available deployment types.</p>
+	</div>
+</div>
+<form method="POST" action="<?php echo $this->url(array('module' => 'default', 'controller' => 'index', 'action' => 'detection'), null, true); ?>">
+	<div class="row">
+		<div class="twelve columns">
+			<?php if ($this->upgrade): ?>
+			<p>A previous installation has been detected. Would you like to upgrade this installation?</p>
+			<?php else: ?>
+			<p>The application has not been detected on target server. Assuming First Time Deployment.</p>
+			<?php endif; ?>
+		</div>
+	</div>
+	<div class="row">
+		<div class="twelve columns">
+			<h5>Display of current target</h5>
+			<iframe src="<?php echo $this->escape($this->url); ?>" height="250px" width="100%"></iframe>
+		</div>
+	</div>
+	<div class="row nudgedown">
+		<div class="six columns" align="left">
+			<span class="has-tip tip-top" title="Select different target"><a href="<?php echo $this->url(array('module' => 'default', 'controller' => 'index', 'action' => 'target'), null, true); ?>" class="button">&Lt; Cancel</a></span>
+		</div>
+		<div class="six columns" align="right">
+			<?php if ($this->upgrade): ?>
+			<span class="has-tip tip-top" title="Begin upgrading installation."><input type="submit" id="nextbutton" class="button" value="Yes, upgrade &Gt;" /></span>
+			<?php else: ?>
+			<span class="has-tip tip-top" title="Begin Deployment"><input type="submit" id="nextbutton" class="button" value="Start &Gt;" /></span>
+			<?php endif; ?>
+		</div>
+	</div>
+</form>

@@ -1,0 +1,21 @@
+<f..+..+..+ website/index.php
+>f.+..+..+. website/var/config/system.xml
+cL+..+..+.. public
+hf ? ? ? ?  asserts
+.D? ? ? ? ? device
+*Scstpog.ax whatevers
+
+Number of files: 189315
+Number of files transferred: 178767
+Total file size: 241571342342 bytes
+Total transferred file size: 241571342341 bytes
+Literal data: 241571342341 bytes
+Matched data: 1 bytes
+File list size: 4081453
+File list generation time: 0.002 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 241571342343
+Total bytes received: 3443432
+
+sent 241612234453 bytes  received 3443234234 bytes  30673324 bytes/sec
+total size is 241575345234  speedup is 1.00

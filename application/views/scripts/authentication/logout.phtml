@@ -1,0 +1,9 @@
+<?php $this->headMeta()->appendHttpEquiv('refresh', '5;URL='.$this->url(array('module' => 'default', 'controller' => 'index', 'action' => 'index'), null, false)); ?>
+<form>
+	<div class="row">
+		<div class="six columns centered">
+			<h4>Login</h4>
+			<p>You are not logged out. You will be redirected to the <a href="<?php echo $this->url(array('module' => 'default', 'controller' => 'index', 'action' => 'index'), null, false); ?>">homepage</a>.</p>
+		</div>
+	</div>
+</form>

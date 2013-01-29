@@ -1,0 +1,101 @@
+<?php
+//Set page title
+$this->headTitle('Database');
+
+// Get the base url, so our application does not need to be at the root location.
+$baseUrl = Zend_Controller_Front::getInstance()->getBaseUrl();
+
+// Append script at the end of the page, like it should
+$this->headScript()->appendFile($baseUrl . '/javascripts/index/database.js');
+?>
+<div class="row">
+	<div class="twelve columns">
+		<h4>Database</h4>
+		<?php if ($this->dbChanged): ?>
+		<p>The database schema has been changed. Please select your database upgrade strategy.</p>
+		<?php else: ?>
+		<p>The database schema has not been changed. Is this correct?</p>
+		<?php endif; ?>
+	</div>
+</div>
+<form method="POST" action="<?php echo $this->url(array('module' => 'default', 'controller' => 'upgrade', 'action' => 'database'), null, true); ?>">
+	<?php if ($this->dbChanged): ?>
+	<?php foreach ($this->sqlPatch as $name => $patch): ?>
+	<div class="row">
+		<div class="size columns centered">
+			<label>Database upgrade strategy for database <?php echo $this->escape($name) ?></label>
+			<select class="dbStrategy" name="dbStrategy[<?php echo $this->escape($name) ?>]" <?php echo (isset($this->errors['dbStrategy'][$name])) ? 'class="error"' : ''; ?>>
+				<option value="">Select a database upgrade strategy&hellip;</option>
+				<?php foreach ($this->dbStrategies as $value => $dbStrategy): ?>
+					<option <?php echo ($value == $this->dbStrategy[$name]) ? 'selected="selected" ' : ''; ?>value="<?php echo $this->escape($value); ?>"><?php echo $this->escape($dbStrategy); ?></option>
+				<?php endforeach; ?>
+			</select>
+			<?php if (isset($this->errors['dbStrategy'][$name])): ?>
+			<small class="error"><?php echo $this->escape($this->errors['dbStrategy'][$name]); ?></small>
+			<?php endif; ?>
+		</div>
+	</div>
+	<?php endforeach; ?>
+	<div class="row nudgedown manualMode" style="display:none;">
+		<div class="twelve columns">
+			<table class="twelve">
+				<thead>
+					<tr>
+						<th width="20px" align="center"><span class="has-tip tip-top" title="Select for deployment">#</span></th>
+						<th>Database</th>
+						<th>Description</th>
+					</tr>
+				</thead>
+				<tbody>
+					<?php foreach ($this->sqlPatch as $name => $patch): ?>
+					<?php $patch->resetPosition(); ?>
+					<?php while (($stmt = $patch->nextQuery())): ?>
+					<?php if (isset($this->sql[$name]) && in_array($patch->getPosSql(), $this->sql[$name])) {
+						$tr = ($stmt !== null && $stmt->getVisible()) ? 'class="sqlRow"' : 'class="sqlRow notImportant" style="display:none;"';
+					} else {
+						$tr = ($stmt !== null && $stmt->getVisible()) ? 'class="sqlRow" style="display:none;"' : 'class="sqlRow notImportant" style="display:none;"';
+					} ?>
+						<tr <?php echo $tr; ?>>
+							<td width="20px"><input type="checkbox" class="sqlCheck" name="sql[<?php echo $this->escape($name) ?>][]" id="sql-<?php echo $this->escape(str_replace(' ', '_', $name)) ?>-<?php echo $this->escape($patch->getPosSql()); ?>" value="<?php echo $this->escape($patch->getPosSql()); ?>" <?php echo (isset($this->sql) && in_array($patch->getPosSql(), $this->sql[$name])) ? 'checked="checked"' : ''; ?>/></td>
+							<td><?php echo $this->escape($name); ?></td>
+							<td class="sqlDesc" data-reveal-id="revealSql-<?php echo $this->escape(str_replace(' ', '_', $name)) ?>-<?php echo $this->escape($patch->getPosSql()); ?>" data-animation="none"><?php echo $this->escape($stmt->getDescription()); ?></td>
+						</tr>
+					<?php endwhile; ?>
+					<?php endforeach; ?>
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<?php endif; ?>
+	<div class="row nudgedown">
+		<div class="four columns" align="left">
+			<span class="has-tip tip-top" title="Detect installation"><a href="<?php echo $this->url(array('module' => 'default', 'controller' => 'index', 'action' => 'detection'), null, true); ?>" class="button">&Lt; Previous</a></span>
+		</div>
+		<div class="four columns" align="center">
+			<select class="manualMode" id="sqlSelect">
+				<option value="1">Show checked</option>
+				<option value="2">Show unchecked</option>
+				<option value="3">Show all</option>
+			</select>
+		</div>
+		<div class="four columns" align="right">
+			<?php if ($this->dbChanged): ?>
+			<span class="has-tip tip-top" title="Select files for deployment"><input type="submit" id="nextbutton" class="secondary disabled button" value="Next &Gt;" /></span>
+			<?php else: ?>
+			<span class="has-tip tip-top" title="Select files for deployment"><input type="submit" id="nextbutton" class="secondary disabled button" value="Yes, Proceed &Gt;" /></span>
+			<?php endif; ?>
+		</div>
+	</div>
+</form>
+<?php if ($this->dbChanged): ?>
+<?php foreach ($this->sqlPatch as $name => $patch): ?>
+<?php $patch->resetPosition(); ?>
+<?php while (($stmt = $patch->nextQuery())): ?>
+	<div id="revealSql-<?php echo $this->escape(str_replace(' ', '_', $name)) ?>-<?php echo $this->escape($patch->getPosSql()); ?>" class="reveal-modal large" style="white-space:pre-wrap;">
+		<h5><?php echo $this->escape($stmt->getDescription()); ?></h5>
+		<p><?php echo trim($this->escape($stmt->getSql())); ?></p>
+		<a class="close-reveal-modal">&#215;</a>
+	</div>
+<?php endwhile; ?>
+<?php endforeach; ?>
+<?php endif; ?>

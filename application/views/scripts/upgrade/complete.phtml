@@ -1,0 +1,48 @@
+<?php
+//Set page title
+$this->headTitle('Finished');
+// Get the base url, so our application does not need to be at the root location.
+$baseUrl = Zend_Controller_Front::getInstance()->getBaseUrl();
+
+// Append script at the end of the page, like it should
+$this->headScript()->appendFile($baseUrl . '/javascripts/index/logs.js');
+?>
+<div class="row">
+	<div class="twelve columns">
+		<h4>Finished&hellip;</h4>
+		<?php if ($this->success): ?>
+			<p>The application has been deployed!</p>
+		<?php else: ?>
+			<p>The application has failed to deploy! Consult the logs for more information.</p>
+		<?php endif; ?>
+		<ul>
+			<li>You can <a href="<?php echo $this->escape($this->url); ?>" target="_blank">visit the application</a>.</li>
+			<li>You can <span class="showInformation" style="color:#2BA6CB; cursor: pointer;">review the logs of the deployment</span>.</li>
+		</ul>
+	</div>
+</div>
+<div class="row information" style="display: none;">
+	<div class="twelve columns">
+		<h5>Logs</h5>
+	</div>
+</div>
+<div class="row information" style="display: none;">
+	<div class="twelve columns pre">
+		<?php if ($this->stdouts) : ?>
+			<?php
+			foreach ($this->stdouts as $stdout) : echo str_replace("</span>", '</span><br />', $stdout->getOutputWithoutColors()) . '<br />';
+			endforeach;
+			?>
+<?php endif; ?>
+	</div>
+</div>
+<form method="POST" action="<?php echo $this->url(array('module' => 'default', 'controller' => 'upgrade', 'action' => 'complete'), null, true); ?>">
+	<div class="row nudgedown">
+		<div class="six columns" align="left">
+			<a href="<?php echo $this->url(array('module' => 'default', 'controller' => 'rollback', 'action' => 'index'), null, true); ?>" class="button">&Lt; Oops, Rollback!</a>
+		</div>
+		<div class="six columns" align="right">
+			<span class="has-tip tip-top" title="Go home"><input type="submit" id="nextbutton" class="button" value="Finish Deployment" /></span>
+		</div>
+	</div>
+</form>

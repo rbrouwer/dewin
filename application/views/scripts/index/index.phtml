@@ -1,0 +1,38 @@
+<?php
+//Set page title
+$this->headTitle('Welcome');
+
+// Get the base url, so our application does not need to be at the root location.
+$baseUrl = Zend_Controller_Front::getInstance()->getBaseUrl();
+
+// Append script at the end of the page, like it should
+$this->headScript()->appendFile($baseUrl . '/javascripts/index/requiredselect.js');
+?>
+<div class="row">
+	<div class="twelve columns">
+		<h4>Welcome</h4>
+		<p>Select a deployment recipe to begin.</p>
+		<p class="subheader">A deployment recipe is a collection of scripts to manage a deployment process. The recipe will take you through the steps to deploy your website or application.</p>
+	</div>
+</div>
+<form method="POST" action="<?php echo $this->url(array('module' => 'default', 'controller' => 'index', 'action' => 'index'), null, true); ?>">
+	<div class="row">
+		<div class="twelve columns">
+			<label>Recipe</label>
+			<select id="required" name="recipe" class="twelve columns">
+				<option value="">Select a recipe&hellip;</option>
+				<?php foreach ($this->recipes as $recipe): ?>
+					<option <?php echo ($recipe->getPath() == $this->recipePath) ? 'selected="selected" ' : '' ;?>value="<?php echo $this->escape($recipe->getFileName()); ?>"><?php echo $this->escape($recipe->getName()); ?></option>
+				<?php endforeach; ?>
+			</select>
+		</div>
+	</div>
+	<div class="row nudgedown">
+		<div class="six columns" align="left">
+			<!--a href="#" class="disabled button">&Lt; Cancel</a-->
+		</div>
+		<div class="six columns" align="right">
+			<span class="has-tip tip-top" title="Read notices"><input type="submit" id="nextbutton" class="secondary disabled button" value="Next &Gt;" /></span>
+		</div>
+	</div>
+</form>

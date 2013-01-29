@@ -1,0 +1,73 @@
+<?php
+//Prepend title
+$this->headTitle()->setSeparator(' - ');
+$this->headTitle('Dewin', 'PREPEND');
+
+// Get the base url, so our application does not need to be at the root location.
+$baseUrl = Zend_Controller_Front::getInstance()->getBaseUrl();
+
+// prepend javascript and stylesheets (on reverse order)
+$this->headScript()->prependFile($baseUrl . '/javascripts/app.js');
+$this->headLink()->prependStylesheet($baseUrl . '/stylesheets/app.css');
+
+// Minimized versions(true) or normal(false); add proper switch here?
+if (false) {
+	$this->headScript()->prependFile($baseUrl . '/javascripts/foundation.min.js');
+	$this->headLink()->prependStylesheet($baseUrl . '/stylesheets/foundation.min.css');
+} else {
+	$this->headScript()->prependFile($baseUrl . '/javascripts/jquery.foundation.mediaQueryToggle.js');
+	$this->headScript()->prependFile($baseUrl . '/javascripts/jquery.foundation.forms.js');
+	$this->headScript()->prependFile($baseUrl . '/javascripts/jquery.foundation.reveal.js');
+	$this->headScript()->prependFile($baseUrl . '/javascripts/jquery.foundation.orbit.js');
+	$this->headScript()->prependFile($baseUrl . '/javascripts/jquery.foundation.navigation.js');
+	$this->headScript()->prependFile($baseUrl . '/javascripts/jquery.foundation.buttons.js');
+	$this->headScript()->prependFile($baseUrl . '/javascripts/jquery.foundation.tabs.js');
+	$this->headScript()->prependFile($baseUrl . '/javascripts/jquery.foundation.tooltips.js');
+	$this->headScript()->prependFile($baseUrl . '/javascripts/jquery.foundation.accordion.js');
+	$this->headScript()->prependFile($baseUrl . '/javascripts/jquery.placeholder.js');
+	$this->headScript()->prependFile($baseUrl . '/javascripts/jquery.foundation.alerts.js');
+	$this->headScript()->prependFile($baseUrl . '/javascripts/jquery.foundation.topbar.js');
+	$this->headScript()->prependFile($baseUrl . '/javascripts/modernizr.foundation.js');
+	$this->headLink()->prependStylesheet($baseUrl . '/stylesheets/foundation.css');
+}
+$this->headScript()->prependFile($baseUrl . '/javascripts/jquery.js');
+
+// Content type and other meta header here...
+$this->headMeta()->prependHttpEquiv('Content-Type', 'text/html; charset=UTF-8');
+?>
+
+<html>
+  <head>
+    <?php echo $this->headTitle() ?>
+    <?php echo $this->headMeta(); ?>
+		<?php echo $this->headLink(); ?>
+  </head>
+  <body>
+	  <nav class="top-bar">
+		  <ul>
+			  <li class="name"><h1><a href="<?php echo $this->url(array('module' => 'default', 'controller' => 'index', 'action' => 'index'), null, false); ?>">Dewin</a></h1></li>
+			  <li class="toggle-topbar"><a href="#"></a></li>
+		  </ul>
+		  <section>
+			  <ul class="right">
+				  <?php if (Zend_Auth::getInstance()->hasIdentity()): ?>
+					  <li><a href="<?php echo $this->url(array('module' => 'default', 'controller' => 'snapshot', 'action' => 'index'), null, false); ?>">Snapshot</a></li>
+					  <li><a href="<?php echo $this->url(array('module' => 'default', 'controller' => 'rollback', 'action' => 'index'), null, false); ?>">Rollback</a></li>
+					  <li><a href="http://wiki.online.schuttelaar.nl/index.php?title=Deployment" target="_blank">Help</a></li>
+					  <li><a href="#">Logs</a></li>
+					  <li><a href="<?php echo $this->url(array('module' => 'default', 'controller' => 'authentication', 'action' => 'logout'), null, false); ?>">Logout(<?php echo $this->escape(ucfirst(Zend_Auth::getInstance()->getIdentity())) ?>)</a></li>
+				  <?php endif; ?>
+			  </ul>
+		  </section>
+	  </nav>
+		<?php echo $this->linearPath(); ?>
+		<?php echo $this->layout()->content; ?>
+		<footer class="row">
+			<section class="twelve columns">
+				<hr />
+				<p align="center" class="subheader">Version 0.1&frac14;<br />Author: Robin Brouwer</p>
+			</section>
+		</footer>
+		<?php echo $this->headScript(); ?>
+  </body>
+</html>

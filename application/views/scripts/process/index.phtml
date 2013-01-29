@@ -1,0 +1,11 @@
+<?php
+// Get the base url, so our application does not need to be at the root location.
+$baseUrl = Zend_Controller_Front::getInstance()->getBaseUrl();
+
+$this->headScript()->appendFile($baseUrl . '/javascripts/process/console.js');
+$this->headScript()->appendScript('callbackurl = "'.$this->callbackUrl.'";', 'text/javascript', array('noescape' => true));
+$this->headScript()->appendScript('processId = '.$this->processId.';', 'text/javascript', array('noescape' => true));
+
+$this->headLink()->prependStylesheet($baseUrl . '/stylesheets/process/console.css');
+?>
+<pre onclick="$('.stdin').focus()"><label><input type="text" name="stdin" onkeydown="handleInput(event)" class="stdin" autocomplete="off"/></label></pre>
