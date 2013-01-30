@@ -255,9 +255,11 @@ class SetupController extends Zend_Controller_Action {
 				R::store($process);
 			}
 			
-			// Travis-ci wants to run unit tests, so remove the setup already so it can do so!
+			// Travis-ci wants to run unit tests, so remove the setup already so it can do so! And add 2 'dummy' server types.
 			if ($client === 'travis-ci') {
 				unlink(APPLICATION_PATH . '/controllers/SetupController.php');
+				copy(APPLICATION_PATH . '/tests/files/server/Demo.php', APPLICATION_PATH . '/models/Server/Demo.php');
+				copy(APPLICATION_PATH . '/tests/files/server/Dev.php', APPLICATION_PATH . '/models/Server/Dev.php');
 			}
 		} else {
 			throw new Zend_Controller_Action_Exception('This page does not exist', 404);
