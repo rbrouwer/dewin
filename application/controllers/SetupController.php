@@ -135,6 +135,29 @@ class SetupController extends Zend_Controller_Action {
 			error_reporting(E_ALL);
 			ini_set('display_errors', '1');
 
+			// Travis needs a config as well, not that it will be used.
+			if ($client === 'travis-ci') {
+				$config = new Zend_Config(array(), true);
+				$config->setExtend('production');
+				$config->production = array();
+				$config->staging = array();
+				$config->testing = array();
+				$config->development = array();
+				$config->production->database = array();
+				$config->production->database->adapter = 'sqlite';
+				$config->production->database->params = array();
+				$config->production->database->params->file = 'unit.sql';
+				$config->production->database->params->username = null;
+				$config->production->database->params->password = null;
+				$config->setExtend('staging', 'production');
+				$config->setExtend('testing', 'staging');
+				$config->setExtend('development', 'testing');
+				Zend_Registry::set('config', $config);
+
+				$writer = new Zend_Config_Writer_Xml();
+				$writer->write(APPLICATION_PATH . DIRECTORY_SEPARATOR . 'configs' . DIRECTORY_SEPARATOR . 'config.xml', $config);
+			}
+			
 			// No need to install this for travis-ci.
 			if ($client !== 'travis-ci') {
 				$config = Zend_Registry::get('config');
@@ -217,7 +240,7 @@ class SetupController extends Zend_Controller_Action {
 			$this->installLib('Directadmin', 'http://files.directadmin.com/services/all/httpsocket/httpsocket.tar.gz', array('httpsocket.php'));
 
 			rename(APPLICATION_PATH . '/../library/Directadmin/httpsocket.php', APPLICATION_PATH . '/../library/Directadmin/httpsocket.php-tmp');
-			file_put_contents(APPLICATION_PATH . '/../library/Directadmin/HttpSocket.php', preg_replace('/if \(\$headers\[\'location\'\]\)/', 'if (isset($headers[\'location\'])', preg_replace('/class HTTPSocket \{/', 'class Directadmin_HttpSocket {', file_get_contents(APPLICATION_PATH . '/../library/Directadmin/httpsocket.php-tmp'))));
+			file_put_contents(APPLICATION_PATH . '/../library/Directadmin/HttpSocket.php', preg_replace('/if \(\$headers\[\'location\'\]\)/', 'if (isset($headers[\'location\']))', preg_replace('/class HTTPSocket \{/', 'class Directadmin_HttpSocket {', file_get_contents(APPLICATION_PATH . '/../library/Directadmin/httpsocket.php-tmp'))));
 			unlink(APPLICATION_PATH . '/../library/Directadmin/httpsocket.php-tmp');
 			
 			// Travis-ci doesn't look at the progress bar. No need to make it.

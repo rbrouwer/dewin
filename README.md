@@ -2,7 +2,7 @@ Dewin
 ===========
 
 Current Build Status:
-[![Build Status](https://secure.travis-ci.org/rbrouwer/dewin.png)](http://travis-ci.org/rbrouwer/dewin)
+[![Build Status](https://travis-ci.org/rbrouwer/dewin.png?branch=master)](https://travis-ci.org/rbrouwer/dewin)
 
 Dewin(DEployment Web INterface or Deinstall Windows or (in Dutch) De Enige Waardeloze INstaller or ...) is a tool that Schuttelaar & Partners is developing to make deploying of their web-applications easier.
 

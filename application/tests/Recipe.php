@@ -4,19 +4,18 @@ class Test_Recipe {
 
 	public function pack() {
 		echo 'Testing Model Recipe:' . PHP_EOL;
-		$config = Zend_Registry::get('config');
-		$config->directories->buildscript = '/tests/files/buildscripts/';
+		$oldConfig = Zend_Registry::get('config');
+		$config = new Zend_Config(array('directories' => array('buildscript' => APPLICATION_PATH.'/tests/files/buildscripts/')));
+		Zend_Registry::set('config', $config);
 		$this->construct();
 		$this->staticFunction();
 		$this->validateFolder();
+		Zend_Registry::set('config', $oldConfig);
 	}
 	
 		
 	public function staticFunction() {
 		echo '- Testing Recipe Fetching' . PHP_EOL;
-		$oldConfig = Zend_Registry::get('config');
-		$config = new Zend_Config(array('directories' => array('buildscript' => APPLICATION_PATH.'/tests/files/buildscripts/')));
-		Zend_Registry::set('config', $config);
 		
 		$recipe = Model_Recipe::getRecipe('recipe0.xml');
 		_equals($recipe, null);
@@ -26,15 +25,13 @@ class Test_Recipe {
 		_equals(count($recipes), 1);
 		_equals(current($recipes)->getPath(), $recipe->getPath());
 		echo PHP_EOL;
-		
-		Zend_Registry::set('config', $oldConfig);
 	}
 
 	public function construct() {
 		echo '- Testing Recipe Loading' . PHP_EOL;
-		$oldConfig = Zend_Registry::get('config');
-		$config = new Zend_Config(array('directories' => array('buildscript' => APPLICATION_PATH.'/tests/files/buildscripts/')));
-		Zend_Registry::set('config', $config);
+
+		$config = Zend_Registry::get('config');
+		
 		try {
 			new Model_Recipe(null, null);
 		} catch (Exception $e) {
@@ -75,15 +72,10 @@ class Test_Recipe {
 		_equals($recipe->getNote(), 'Note line 1'."\n".'Note line 2');
 		_equals($recipe->getTargets(), array('t1', 't2', 't3', 't4', 't5'));
 		echo PHP_EOL;
-		
-		Zend_Registry::set('config', $oldConfig);
 	}
 	
 	public function validateFolder() {
 		echo '- Testing Recipe Validate App folder' . PHP_EOL;
-		$oldConfig = Zend_Registry::get('config');
-		$config = new Zend_Config(array('directories' => array('buildscript' => APPLICATION_PATH.'/tests/files/buildscripts/')));
-		Zend_Registry::set('config', $config);
 		
 		$recipe = Model_Recipe::getRecipe('recipe1.xml');
 		$filesystem = new Model_Filesystem_Local(APPLICATION_PATH.'/tests/files/appsdir/app1');
@@ -97,8 +89,6 @@ class Test_Recipe {
 		$filesystem = new Model_Filesystem_Local(APPLICATION_PATH.'/tests/files/appsdir/app5');
 		_equals($recipe->validateFolder($filesystem), true);
 		echo PHP_EOL;
-		
-		Zend_Registry::set('config', $oldConfig);
 	}
 
 }
