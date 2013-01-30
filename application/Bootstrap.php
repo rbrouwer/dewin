@@ -9,7 +9,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
 			Zend_Registry::set('config', $config);
 		}
 		
-		if (is_file( APPLICATION_PATH . '/../library/RedBean/rb.php')) {
+		if (is_file( APPLICATION_PATH . '/../library/RedBean/rb.php') && Zend_Registry::isRegistered('config')) {
 			$loader = Zend_Loader_Autoloader::getInstance()->registerNamespace('RedBean_');
 			require_once( APPLICATION_PATH . '/../library/RedBean/rb.php'); //or rb.php
 			if ($config->database->adapter === 'mysql') {

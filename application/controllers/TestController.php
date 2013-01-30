@@ -89,8 +89,12 @@ class TestController extends Zend_Controller_Action {
 			$cov = new CoverageRecorder($includePaths, $excludePaths, $reporter);
 
 			// Prepare a temporary database
+			R::setup('sqlite:unit.sql'); //Use simple SQLite database
 			R::addDatabase('testdb', 'sqlite:unit.sql'); //Use simple SQLite database
 			R::selectDatabase('testdb');
+			Zend_Registry::set("tools", R::$toolbox);
+			Zend_Registry::set("db", R::$adapter);
+			Zend_Registry::set("redbean", R::$redbean);
 			R::freeze(false); //Fluid mode. Schema should not matter.
 			
 			// Start tracking

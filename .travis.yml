@@ -1,0 +1,9 @@
+language: php
+php:
+  - "5.3"
+before_script:
+ - mkdir library/Zend
+ - wget -q "https://packages.zendframework.com/releases/ZendFramework-1.12.1/ZendFramework-1.12.1-minimal.tar.gz" -O library/Zend/Zend.tgz
+ - tar -zxvf library/Zend/Zend.tgz --strip-components=2 -C library/ ZendFramework*/library/Zend
+ - php -f public/index.php setup rbspiifs
+script: "(php -f public/index.php test exec 2>&1) | tee unitTestOutput.txt"
