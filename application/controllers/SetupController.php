@@ -233,7 +233,7 @@ class SetupController extends Zend_Controller_Action {
 			}
 			
 			// Travis-ci wants to run unit tests, so remove the setup already so it can do so!
-			if ($client !== 'travis-ci') {
+			if ($client === 'travis-ci') {
 				unlink(APPLICATION_PATH . '/controllers/SetupController.php');
 			}
 		} else {
