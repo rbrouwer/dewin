@@ -158,22 +158,22 @@ class Test_Instance {
 
 		// Wrong database name
 		$i->databaseName = 'doesnotexist';
-		$i->databaseUser = 'test';
-		$i->databasePassword = 'test';
+		$i->databaseUser = 'dewin_unittests';
+		$i->databasePassword = 'dewin_unittests';
 		_equals($i->validateDB(), false);
 
 		// Wrong username
-		$i->databaseName = 'test';
+		$i->databaseName = 'dewin_unittests';
 		$i->databaseUser = 'doesnotexist';
 		_equals($i->validateDB(), false);
 		
 		// Wrong password
-		$i->databaseUser = 'test';
+		$i->databaseUser = 'dewin_unittests';
 		$i->databasePassword = 'doesnotexist';
 		_equals($i->validateDB(), false);
 		
 		// Correct details
-		$i->databasePassword = 'test';
+		$i->databasePassword = 'dewin_unittests';
 		_equals($i->validateDB(), true);
 		
 		// Wrong host
