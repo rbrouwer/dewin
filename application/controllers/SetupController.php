@@ -217,7 +217,7 @@ class SetupController extends Zend_Controller_Action {
 			$this->installLib('Directadmin', 'http://files.directadmin.com/services/all/httpsocket/httpsocket.tar.gz', array('httpsocket.php'));
 
 			rename(APPLICATION_PATH . '/../library/Directadmin/httpsocket.php', APPLICATION_PATH . '/../library/Directadmin/httpsocket.php-tmp');
-			file_put_contents(APPLICATION_PATH . '/../library/Directadmin/HttpSocket.php', preg_replace('if \(\$headers\[\'location\'\]\)', 'if (isset($headers[\'location\'])', preg_replace('/class HTTPSocket \{/', 'class Directadmin_HttpSocket {', file_get_contents(APPLICATION_PATH . '/../library/Directadmin/httpsocket.php-tmp'))));
+			file_put_contents(APPLICATION_PATH . '/../library/Directadmin/HttpSocket.php', preg_replace('/if \(\$headers\[\'location\'\]\)/', 'if (isset($headers[\'location\'])', preg_replace('/class HTTPSocket \{/', 'class Directadmin_HttpSocket {', file_get_contents(APPLICATION_PATH . '/../library/Directadmin/httpsocket.php-tmp'))));
 			unlink(APPLICATION_PATH . '/../library/Directadmin/httpsocket.php-tmp');
 			
 			// Travis-ci doesn't look at the progress bar. No need to make it.
@@ -232,6 +232,10 @@ class SetupController extends Zend_Controller_Action {
 				R::store($process);
 			}
 			
+			// Travis-ci wants to run unit tests, so remove the setup already so it can do so!
+			if ($client !== 'travis-ci') {
+				unlink(APPLICATION_PATH . '/controllers/SetupController.php');
+			}
 		} else {
 			throw new Zend_Controller_Action_Exception('This page does not exist', 404);
 		}

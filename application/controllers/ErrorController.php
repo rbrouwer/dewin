@@ -87,6 +87,7 @@ class ErrorController extends Zend_Controller_Action {
 
 		echo 'Request Parameters:' . PHP_EOL;
 		echo var_export($errors->request->getParams(), true);
+		exit (1);
 	}
 
 }

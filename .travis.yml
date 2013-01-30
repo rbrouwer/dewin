@@ -6,4 +6,4 @@ before_script:
  - wget -q "https://packages.zendframework.com/releases/ZendFramework-1.12.1/ZendFramework-1.12.1-minimal.tar.gz" -O library/Zend/Zend.tgz
  - tar -zxf library/Zend/Zend.tgz --wildcards --strip-components=2 -C library/ ZendFramework*/library/Zend
  - php -f public/index.php setup rbspiifs travis-ci
-script: "(php -f public/index.php test exec 2>&1) | tee unitTestOutput.txt"
+script: "php -f public/index.php test exec"
