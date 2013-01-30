@@ -157,23 +157,23 @@ class Test_Instance {
 		$i = $i->box();
 
 		// Wrong database name
-		$i->databaseName = 'doesnotexisthopefully';
-		$i->databaseUser = 'root';
-		$i->databasePassword = 'root';
+		$i->databaseName = 'doesnotexist';
+		$i->databaseUser = 'test';
+		$i->databasePassword = 'test';
 		_equals($i->validateDB(), false);
 
 		// Wrong username
-		$i->databaseName = 'deploytool';
-		$i->databaseUser = 'doesnotexisthopefully';
+		$i->databaseName = 'test';
+		$i->databaseUser = 'doesnotexist';
 		_equals($i->validateDB(), false);
 		
 		// Wrong password
-		$i->databaseUser = 'root';
-		$i->databasePassword = 'doesnotexisthopefully';
+		$i->databaseUser = 'test';
+		$i->databasePassword = 'doesnotexist';
 		_equals($i->validateDB(), false);
 		
 		// Correct details
-		$i->databasePassword = 'root';
+		$i->databasePassword = 'test';
 		_equals($i->validateDB(), true);
 		
 		// Wrong host
