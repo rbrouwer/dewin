@@ -86,7 +86,7 @@ class ErrorController extends Zend_Controller_Action {
 		echo $errors->exception->getTraceAsString() . PHP_EOL . PHP_EOL;
 
 		echo 'Request Parameters:' . PHP_EOL;
-		echo $this->escape(var_export($errors->request->getParams(), true));
+		echo var_export($errors->request->getParams(), true);
 	}
 
 }

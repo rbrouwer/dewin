@@ -18,7 +18,7 @@ class SetupController extends Zend_Controller_Action {
 			}
 
 			if (is_writable(realpath(APPLICATION_PATH . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'config'))) {
-				$errors['general'][] = realpath(APPLICATION_PATH . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'config/').' is not writable';
+				$errors['general'][] = realpath(APPLICATION_PATH . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'config/') . ' is not writable';
 			}
 
 			$databaseHost = $this->getRequest()->getParam('databaseHost', 'localhost');
@@ -50,9 +50,9 @@ class SetupController extends Zend_Controller_Action {
 			if ($password !== $password2) {
 				$errors['password2'] = 'The passwords do not match!';
 			}
-			$buildscriptPath = $this->getRequest()->getParam('buildscriptPath', realpath(APPLICATION_PATH . '/../buildscripts').'/');
+			$buildscriptPath = $this->getRequest()->getParam('buildscriptPath', realpath(APPLICATION_PATH . '/../buildscripts') . '/');
 			if (empty($buildscriptPath)) {
-				$buildscriptPath = realpath(APPLICATION_PATH . '/../buildscripts').'/';
+				$buildscriptPath = realpath(APPLICATION_PATH . '/../buildscripts') . '/';
 			}
 			if (!is_readable($buildscriptPath) && is_dir($buildscriptPath)) {
 				$errors['buildscriptPath'] = 'This directory should be readable.';
@@ -101,7 +101,7 @@ class SetupController extends Zend_Controller_Action {
 				$config->production->directories = array();
 				$config->production->directories->buildscript = $buildscriptPath;
 				$config->production->directories->deployment = $deploymentPath;
-				
+
 				// Temporary
 				$config->production->servertypes = array();
 				$config->production->servertypes->dev = array();
@@ -116,7 +116,7 @@ class SetupController extends Zend_Controller_Action {
 
 				// Init installer.
 				$pid = trim(shell_exec('nohup php -f ' . $_SERVER["SCRIPT_FILENAME"] . ' setup rbspiifs 2> /dev/null > /dev/null & echo $!'));
-				
+
 				$this->_helper->Redirector->gotoSimple('install');
 			}
 		}
@@ -125,99 +125,113 @@ class SetupController extends Zend_Controller_Action {
 	//RedBean Setup, Phing Install and Init Further Setup.
 	public function rbspiifsAction() {
 		if (PHP_SAPI === 'cli') {
-			$config = Zend_Registry::get('config');
-
 			//Not a page, do not render stuff
 			$this->_helper->layout()->disableLayout();
 			$this->_helper->viewRenderer->setNoRender(true);
+
+			$client = $this->getRequest()->getParam(0);
 
 			//Bypass error handling
 			error_reporting(E_ALL);
 			ini_set('display_errors', '1');
 
-			//Attempt to connect
-			$dsn = 'mysql:host=' . $config->database->params->host . ';dbname=' . $config->database->params->dbname;
-			try {
-				$db = new PDO($dsn, $config->database->params->username, $config->database->params->password);
-				$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-			} catch (PDOException $e) {
-				throw new InvalidArgumentException("Failed to connect to DB.");
-			}
+			// No need to install this for travis-ci.
+			if ($client !== 'travis-ci') {
+				$config = Zend_Registry::get('config');
 
-			// Write database.
-			$sqlFile = realpath(APPLICATION_PATH . '/../install.sql');
 
-			// Really useful that tools to split sql file are embedded.
-			$sqlPatch = new Model_SqlPatch($sqlFile);
-			while (($stmt = $sqlPatch->nextQuery())) {
-				if ($stmt !== null) {
-					$db->exec($stmt->getSql());
+				//Attempt to connect
+				$dsn = 'mysql:host=' . $config->database->params->host . ';dbname=' . $config->database->params->dbname;
+				try {
+					$db = new PDO($dsn, $config->database->params->username, $config->database->params->password);
+					$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+				} catch (PDOException $e) {
+					throw new InvalidArgumentException("Failed to connect to DB.");
+				}
+
+
+				// Write database.
+				$sqlFile = realpath(APPLICATION_PATH . '/../install.sql');
+
+				// Really useful that tools to split sql file are embedded.
+				$sqlPatch = new Model_SqlPatch($sqlFile);
+				while (($stmt = $sqlPatch->nextQuery())) {
+					if ($stmt !== null) {
+						$db->exec($stmt->getSql());
+					}
 				}
 			}
-
 			// Install redbean
 			$this->installLib('RedBean', 'http://www.redbeanphp.com/downloads/RedBeanPHP3_3_7.tar.gz', array('rb.php'));
 			require_once( APPLICATION_PATH . '/../library/RedBean/rb.php');
-			
-			// Init redbean.
-			R::setup('mysql:host=' . $config->database->params->host . ';dbname=' . $config->database->params->dbname, $config->database->params->username, $config->database->params->password);
-			Zend_Registry::set("tools", R::$toolbox);
-			Zend_Registry::set("db", R::$adapter);
-			Zend_Registry::set("redbean", R::$redbean);
 
-			// Temporary
-			$server = R::dispense('server');
-			$server->type = 'dev';
-			$server->user = 'www-data';
-			$server->group = 'www-data';
-			$server->baseurl = 'dev';
-			$server->host = 'localhost';
-			$server->name = 'Development server';
-			$server->access = 'access';
-			R::store($server);
-			
-			// Make proces #1, so i can control progress-bar etc etc.
-			$process = R::dispense('process');
-			$process->target = 'Installing';
-			$process->status = 'Running';
-			$process->percent = 20;
-			$process->msg = 'Installed RB, done initial fill of the database';
-			R::store($process);
+			// Unit test do not require an initialized redbean(for fancy progress bar!) and phing at this point in time.
+			if ($client !== 'travis-ci') {
+				// Init redbean.
+				R::setup('mysql:host=' . $config->database->params->host . ';dbname=' . $config->database->params->dbname, $config->database->params->username, $config->database->params->password);
+				Zend_Registry::set("tools", R::$toolbox);
+				Zend_Registry::set("db", R::$adapter);
+				Zend_Registry::set("redbean", R::$redbean);
 
-			$this->installLib('phing', 'http://www.phing.info/get/phing-2.4.13.tgz', null, true);
-			//$this->copyDir(APPLICATION_PATH . '/../library/PhingTasks', APPLICATION_PATH . '/../tools/phing/classes/phing/tasks/dewin');
-			symlink(APPLICATION_PATH . '/../library/PhingTasks', APPLICATION_PATH . '/../tools/phing/classes/phing/tasks/dewin');
-			file_put_contents(APPLICATION_PATH . '/../tools/phing/classes/phing/tasks/defaults.properties', preg_replace('/phing=phing\.tasks\.system.PhingTask/', 'phing=phing.tasks.dewin.BetterPhingTask', file_get_contents(APPLICATION_PATH . '/../tools/phing/classes/phing/tasks/defaults.properties')));
+				// Temporary
+				$server = R::dispense('server');
+				$server->type = 'dev';
+				$server->user = 'www-data';
+				$server->group = 'www-data';
+				$server->baseurl = 'dev';
+				$server->host = 'localhost';
+				$server->name = 'Development server';
+				$server->access = 'access';
+				R::store($server);
 
+				// Make proces #1, so i can control progress-bar etc etc.
+				$process = R::dispense('process');
+				$process->target = 'Installing';
+				$process->status = 'Running';
+				$process->percent = 20;
+				$process->msg = 'Installed RB, done initial fill of the database';
+				R::store($process);
 
-			$process->percent = 40;
-			$process->msg = 'Installed Phing';
-			R::store($process);
+				$this->installLib('phing', 'http://www.phing.info/get/phing-2.4.13.tgz', null, true);
+				//$this->copyDir(APPLICATION_PATH . '/../library/PhingTasks', APPLICATION_PATH . '/../tools/phing/classes/phing/tasks/dewin');
+				symlink(APPLICATION_PATH . '/../library/PhingTasks', APPLICATION_PATH . '/../tools/phing/classes/phing/tasks/dewin');
+				file_put_contents(APPLICATION_PATH . '/../tools/phing/classes/phing/tasks/defaults.properties', preg_replace('/phing=phing\.tasks\.system.PhingTask/', 'phing=phing.tasks.dewin.BetterPhingTask', file_get_contents(APPLICATION_PATH . '/../tools/phing/classes/phing/tasks/defaults.properties')));
+
+				$process->percent = 40;
+				$process->msg = 'Installed Phing';
+				R::store($process);
+			}
 
 			$this->installLib('SpikePHPCoverage-unpack', 'http://freefr.dl.sourceforge.net/project/phpcoverage/spikephpcoverage/0.8.2/phpcoverage-0.8.2.tar.gz', null);
 			// Do some furth unpacking
 			rename(APPLICATION_PATH . '/../library/SpikePHPCoverage-unpack/spikephpcoverage-0.8.2/src', APPLICATION_PATH . '/../library/SpikePHPCoverage');
 			$this->deleteDir(APPLICATION_PATH . '/../library/SpikePHPCoverage-unpack/');
-
-
-			$process->percent = 60;
-			$process->msg = 'Installed SpikePHPCoverage';
-			R::store($process);
-
+			
+			// Travis-ci doesn't look at the progress bar. No need to make it
+			if ($client !== 'travis-ci') {
+				$process->percent = 60;
+				$process->msg = 'Installed SpikePHPCoverage';
+				R::store($process);
+			}
 			// convert class
 			$this->installLib('Directadmin', 'http://files.directadmin.com/services/all/httpsocket/httpsocket.tar.gz', array('httpsocket.php'));
 
 			rename(APPLICATION_PATH . '/../library/Directadmin/httpsocket.php', APPLICATION_PATH . '/../library/Directadmin/httpsocket.php-tmp');
 			file_put_contents(APPLICATION_PATH . '/../library/Directadmin/HttpSocket.php', preg_replace('if \(\$headers\[\'location\'\]\)', 'if (isset($headers[\'location\'])', preg_replace('/class HTTPSocket \{/', 'class Directadmin_HttpSocket {', file_get_contents(APPLICATION_PATH . '/../library/Directadmin/httpsocket.php-tmp'))));
 			unlink(APPLICATION_PATH . '/../library/Directadmin/httpsocket.php-tmp');
-			$process->percent = 80;
-			$process->msg = 'DA-Dewin Link';
-			R::store($process);
+			
+			// Travis-ci doesn't look at the progress bar. No need to make it.
+			if ($client !== 'travis-ci') {
+				$process->percent = 80;
+				$process->msg = 'DA-Dewin Link';
+				R::store($process);
 
-			$process->percent = 100;
-			$process->status = 'Finished';
-			$process->msg = 'Dependancies installed';
-			R::store($process);
+				$process->percent = 100;
+				$process->status = 'Finished';
+				$process->msg = 'Dependancies installed';
+				R::store($process);
+			}
+			
 		} else {
 			throw new Zend_Controller_Action_Exception('This page does not exist', 404);
 		}
@@ -323,14 +337,14 @@ class SetupController extends Zend_Controller_Action {
 			$this->_helper->viewRenderer->renderBySpec('waiting', array('module' => 'default', 'controller' => 'index'));
 		}
 	}
-	
+
 	public function completeAction() {
 		// Handle the finish button, unset session and return to index
 		if ($this->getRequest()->isPost()) {
 			unlink(APPLICATION_PATH . '/controllers/SetupController.php');
 			$this->_helper->Redirector->gotoSimple('index', 'index');
 		}
-		
+
 		// One of the last things the setup does.
 		if (class_exists('Directadmin_HttpSocket')) {
 			$this->view->success = true;
@@ -338,5 +352,6 @@ class SetupController extends Zend_Controller_Action {
 			$this->view->success = false;
 		}
 	}
+
 }
 
