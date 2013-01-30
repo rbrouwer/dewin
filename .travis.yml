@@ -6,5 +6,5 @@ before_script:
  - wget -q "https://packages.zendframework.com/releases/ZendFramework-1.12.1/ZendFramework-1.12.1-minimal.tar.gz" -O library/Zend/Zend.tgz
  - tar -zxf library/Zend/Zend.tgz --wildcards --strip-components=2 -C library/ ZendFramework*/library/Zend
  - php -f public/index.php setup rbspiifs travis-ci
- - mysql -e 'CREATE USER dewin_unittests@localhost IDENTIFIED BY "dewin_unittests"; CREATE DATABASE IF NOT EXISTS dewin_unittests; GRANT ALL ON dewin_unittests.* TO dewin@localhost;'
+ - mysql -e 'CREATE USER dewin_unittests@localhost IDENTIFIED BY "dewin_unittests"; CREATE DATABASE IF NOT EXISTS dewin_unittests; GRANT ALL ON dewin_unittests.* TO dewin_unittests@localhost;' -uroot
 script: "php -f public/index.php test exec"
