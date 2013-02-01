@@ -78,10 +78,10 @@ class BetterPhingTask extends Task {
     private $haltOnFailure = false;
 	 
 	 /** the properties to pass to the new project */
-    private $writePropertiesBack = true;
+    private $writePropertiesBack = false;
 	 
     /**
-     *  If true, abort the build process if there is a problem with or in the target build file.
+     *  If true, all properties in the local scope are written back to the scope.
      *  Defaults to false.
      *
      *  @param boolean new value

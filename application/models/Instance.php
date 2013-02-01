@@ -180,7 +180,7 @@ class Model_Instance extends RedBean_SimpleModel {
 		$user = $this->settings['databaseUser'];
 		$password = $this->settings['databasePassword'];
 		try {
-			$db = new PDO($dsn, $user, $password);
+			$db = @new PDO($dsn, $user, $password);
 			$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		} catch (PDOException $e) {
 			return false;
