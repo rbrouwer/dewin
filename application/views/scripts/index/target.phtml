@@ -7,7 +7,9 @@ $baseUrl = Zend_Controller_Front::getInstance()->getBaseUrl();
 
 // Append script at the end of the page, like it should
 $this->headScript()->appendScript('sourceProject = "' . $this->escape($this->source_project) . '";', 'text/javascript', array('noescape' => true));
-$this->headScript()->appendScript('callbackurl = "' . $this->callbackUrl . '";', 'text/javascript', array('noescape' => true));
+$this->headScript()->appendScript('var callbackurl = "' . $this->callbackUrl . '";', 'text/javascript', array('noescape' => true));
+$this->headScript()->appendScript('var callbackurlInstance = "' . $this->callbackUrlInstance . '"; var instFilterNew = true; var instFilterSource = true; var instDefaultText = \'Deploy to a new target\'', 'text/javascript', array('noescape' => true));
+$this->headScript()->appendFile($baseUrl . '/javascripts/index/source.js');
 $this->headScript()->appendFile($baseUrl . '/javascripts/index/target2.js');
 ?>
 <div class="row">
@@ -33,16 +35,29 @@ $this->headScript()->appendFile($baseUrl . '/javascripts/index/target2.js');
 			</select>
 			<br /><br />
 			<?php if (isset($this->errors['serverId'])): ?>
-				<small class="error" id="errorTargetId"><?php echo $this->escape($this->errors['serverId']); ?></small>
+				<small class="error" id="targetIdError"><?php echo $this->escape($this->errors['serverId']); ?></small>
 			<?php endif; ?>
-			<label>Desired URL</label>
-			<input type="text" name="url" placeholder="Desired URL"<?php echo ($this->url) ? ' value="' . $this->escape($this->url) . '"' : ''; ?> <?php echo (isset($this->errors['url'])) ? ' class="error"' : ''; ?> />
-			<?php if (isset($this->errors['url'])): ?>
-				<small class="error" id="errorUrl"><?php echo $this->escape($this->errors['url']); ?></small>
+			<label>Instance</label>
+			<select name="instance" <?php echo (isset($this->errors['instanceId'])) ? ' class="error"' : ''; ?>>
+				<option value="">Deploy to a new target&hellip;</option>
+			</select>
+			<br /><br />
+			<?php if (isset($this->errors['instance'])): ?>
+				<small class="error" id="instanceError"><?php echo $this->escape($this->errors['instance']); ?></small>
 			<?php endif; ?>
 		</div>
 	</div>
-	<div class="row">
+	<div class="row newTarget">
+		<div class="six columns centered">
+
+			<label>Desired URL</label>
+			<input type="text" name="url" placeholder="Desired URL"<?php echo ($this->url) ? ' value="' . $this->escape($this->url) . '"' : ''; ?> <?php echo (isset($this->errors['url'])) ? ' class="error"' : ''; ?> />
+			<?php if (isset($this->errors['url'])): ?>
+				<small class="error" id="urlError"><?php echo $this->escape($this->errors['url']); ?></small>
+			<?php endif; ?>
+		</div>
+	</div>
+	<div class="row newTarget">
 		<div class="six columns centered" id="customTargetForm">
 		</div>
 	</div>

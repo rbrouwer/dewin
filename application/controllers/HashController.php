@@ -16,37 +16,10 @@ class HashController extends Zend_Controller_Action {
 			$instance = R::load('instance', $instanceId);
 		}
 		if ($instanceId && $instance->id !== 0) {
-			$server = $instance->server;
-			if ($server->access === 'local') {
-				$filesystem = new Model_Filesystem_Local($instance->box()->webroot);
-			} elseif ($server->access === 'remote') {
-
-				if (isset($instance->box()->host)) {
-					$host = $instance->box()->host;
-				} elseif (isset($server->host)) {
-					$host = $server->host;
-				} else {
-					$host = null;
-				}
-
-				if (isset($instance->box()->user)) {
-					$user = $instance->box()->user;
-				} elseif (isset($server->cpu) && !empty($server->cpu)) {
-					$user = $server->cpu;
-				} else {
-					$user = null;
-				}
-
-				if (isset($instance->box()->password)) {
-					$password = $instance->box()->password;
-				} else {
-					$password = null;
-				}
-				$filesystem = new Model_Filesystem_Sftp($host, $user, $instance->box()->webroot, $password);
-			}
+			$filesystem = $instance->getFilesystem();
 
 			$hash = $filesystem->getHash('');
-			$instance = R::load('instance', $instance->id);
+			$instance = R::load('instance', $instance->id); 
 			$instance->filehash = $hash;
 			R::store($instance);
 		}

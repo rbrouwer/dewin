@@ -1,9 +1,24 @@
-var remoteProject = '';
+// Contains the filled in name of the project allowing the tool to suggest urls
+var targetProject = '';
+
+// Contains whenever the test button was pressed...
 var changeTestButton = false;
+
+// These 3 contain names of the elements in the custom form
 var selects = [];
 var inputs = [];
 var textareas = [];
 
+// TEMP: used for callback from source instance stuff.
+instCallback = 'makeSuggestionInstance';
+
+// Contains the ID of the suggested instance.
+var suggestedInstance = '';
+
+// Allow suggesting instances. This prevents locking users in when the desired URL.
+var allowSuggestedInstances = false;
+
+// I love escaping, these things are escaped in #customform elements
 var tagsToReplace = {
 	'&': '&amp;',
 	'"': '&quot;',
@@ -11,26 +26,39 @@ var tagsToReplace = {
 	'>': '&gt;'
 };
 
+// This suggests a desired url based on the server's baseurl and the project's source or target name
 function makeSuggestion() {
 	var attr = $('select[name=serverId] option:selected').attr('data');
 	var value;
-	console.debug(attr);
 	if (typeof attr !== 'undefined' && attr !== '') {
-		if (remoteProject != '') {
-			value = "http://"+remoteProject.split("_").reverse().join(".")+"."+attr
+		if (targetProject != '') {
+			value = "http://"+targetProject.split("_").reverse().join(".")+"."+attr
 		} else {
 			value = "http://"+sourceProject+"."+attr
 		}
 	} else {
-		if (remoteProject != '') {
-			value = "http://"+remoteProject.split("_").reverse().join(".")
+		if (targetProject != '') {
+			value = "http://"+targetProject.split("_").reverse().join(".")
 		} else {
 			value = "http://"+sourceProject
 		}
 	}
-	$("input[name=url]").val(value)
+	$("input[name=url]").val(value);
 }
 
+// This sets the suggested instance, when instance and the validator are ready.
+function makeSuggestionInstance() {
+	if ($('select[name=serverId]').val() === instServerId && allowSuggestedInstances === true && suggestedInstance !== '') {
+		if ($('select[name=instance]').val() !== suggestedInstance) {
+			$('select[name=instance]').val(suggestedInstance);
+			allowSuggestedInstances = false;
+		}
+	}
+	hideTargetForm();
+}
+
+// Reads the desired url and attempts to set the target project name.
+// That way the desired url will keep the name when another server is selected.
 function setRemoteProject() {
 	var baseUrl = $('select[name=serverId] option:selected').attr('data');
 	var desiredUrl = $('input[name=url]').val();
@@ -43,43 +71,73 @@ function setRemoteProject() {
 		var regex = new RegExp("^(.*)\."+baseUrl.replace("/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g", "\\$&")+"$","i");
 		var replace = "$1"
 		if (regex.test(desiredUrl)) {
-			remoteProject = desiredUrl.replace(regex,replace).split(".").reverse().join("_");
+			targetProject = desiredUrl.replace(regex,replace).split(".").reverse().join("_");
 		} else {
-			remoteProject = '';
+			targetProject = '';
 		}
 	} else {
-		remoteProject = desiredUrl.split(".").reverse().join("_");
+		targetProject = desiredUrl.split(".").reverse().join("_");
 	}
 }
 
+// HTML escaping
 function replaceTag(tag) {
 	return tagsToReplace[tag] || tag;
 }
 
+// HTML escaping
 function htmlspecialchars(str) {
 	return str.replace(/[&"<>]/g, replaceTag);
 }
 
+// Target ajax form validator function
 function ajaxFormValidate() {
-	$('#test').removeClass('secondary').removeClass('success').removeClass('alert');
-	var postData = getFormdata();
-	$.ajax({
-		url: callbackurl,
-		dataType: 'json',
-		type: 'POST',
-		data: postData,
-		timeout: 2000,
-		success: function(data){
-			processAjaxReply(data);
-		},
-		error: function(){
-			$('#nextbutton').addClass('disabled').addClass('secondary');
-			$('#test').addClass('secondary');
+	// Remove any state from the test button
+	$('#test').removeClass('secondary').removeClass('success').removeClass('alert').html('Testing&hellip;');
+
+	// When an instance is select, do not bother to ajax validate the form. Instances should ALWAYS be valid.
+	if ($('select[name=instance]').val() != '') {
+		// Incase the test button was pressed, update the test button.
+		if (changeTestButton) {
+			$('#test').addClass('success').html('Passed');
 		}
-	});
+		
+		// Enable the next button
+		$('#nextbutton').removeClass('disabled').removeClass('secondary');
+		changeTestButton = false;
+	} else {
+		// When there is no instance selects, validate using ajax
+		var postData = getFormdata();
+		$.ajax({
+			url: callbackurl,
+			dataType: 'json',
+			type: 'POST',
+			data: postData,
+			timeout: 2000,
+			success: function(data){
+				// No data is also a fail!
+				if (typeof data === 'undefined' || data === null) {
+					processFailedAjaxReply();
+				} else {
+					// Reset the button, so processAjaxReply can change it further.
+					$('#test').html('Test').removeAttr("disabled").removeClass('disabled');
+					processAjaxReply(data);
+				}
+			},
+			error: function(){
+				processFailedAjaxReply();
+			}
+		});
+	}
 }
 
+// First fill is used to restore the previous state of the form!
 function ajaxFormFirstFill() {
+	// Allow suggestions in this case and also feel the instance dropdown
+	allowSuggestedInstances = true;
+	ajaxInstanceFormFill();
+	
+	// Get the previous state
 	$.ajax({
 		url: callbackurl,
 		dataType: 'json',
@@ -87,8 +145,18 @@ function ajaxFormFirstFill() {
 		timeout: 2000,
 		success: function(data){
 			processAjaxReply(data);
+		},
+		error: function(){
+			setTimeout(function() {ajaxFormFirstFill();}, 3000);
 		}
 	});
+}
+
+// Ajax validation form 
+function processFailedAjaxReply() {
+	$('#nextbutton').addClass('disabled').addClass('secondary');
+	$('#test').addClass('secondary').addClass('disabled').attr("disabled", "disabled").html('Retrying&hellip;');
+	setTimeout(function() {ajaxFormValidate();}, 3000);
 }
 
 function processAjaxReply(data) {
@@ -129,7 +197,12 @@ function processAjaxReply(data) {
 		$('#customTargetForm').empty();
 	}
 	
+	// Set values
 	if (typeof data.values !== 'undefined') {
+		// Reset suggested instance
+		suggestedInstance = '';
+		
+		// foreach value, look up which type and set the value
 		for(var value in data.values) {
 			if ($.inArray(value, selects) !== -1) {
 				$('#customTargetForm select[name='+htmlspecialchars(value)+']').val(data.values[value]);
@@ -137,57 +210,67 @@ function processAjaxReply(data) {
 				$('#customTargetForm input[name='+htmlspecialchars(value)+']').val(data.values[value]);
 			} else if ($.inArray(value, textareas) !== -1) {
 				$('#customTargetForm textarea[name='+htmlspecialchars(value)+']').val(data.values[value]);
+			} else if (value === 'instance') {
+				suggestedInstance = data.values[value];
 			}
 		}
 	}
 	
-	$('#serverIdError, #urlError').remove();
-	$('select[name=serverId]').removeClass('error');
-	$('input[name=url]').removeClass('error');
+	// Re-do all errors...
+	$('#serverIdError, #instanceError, #urlError').remove();
+	$('select[name=serverId], select[name=instance], input[name=url]').removeClass('error');
 	if (typeof data.errors !== 'undefined' && data.errors !== null) {
-		for(var value in data.errors) {
-			if (value === 'serverId') {
-				$('select[name=serverId]').addClass('error').next().next()
-				.after('<small class="error" id="serverIdError">'+htmlspecialchars(data.errors[value])+'</small>');
-			} else if (value === 'url') {
+		for(var error in data.errors) {
+			if (error === 'serverId' || error === 'instance') {
+				$('select[name='+error+']').addClass('error').next().next()
+				.after('<small class="error" id="'+error+'Error">'+htmlspecialchars(data.errors[error])+'</small>');
+			} else if (error === 'url') {
 				if ($('input[name=url]').val() !== '' || changeTestButton) {
 					$('input[name=url]').addClass('error')
-					.after('<small class="error" id="urlError">'+htmlspecialchars(data.errors[value])+'</small>');
+					.after('<small class="error" id="urlError">'+htmlspecialchars(data.errors[error])+'</small>');
 				}
-			} else if ($.inArray(value, selects) !== -1) {
-				if ($('#customTargetForm select[name='+htmlspecialchars(value)+']').val() !== '' || changeTestButton) {
-					$('#customTargetForm select[name='+htmlspecialchars(value)+']').addClass('error')
-					.after('<br/><br/><small class="error">'+htmlspecialchars(data.errors[value])+'</small>');
+			} else if ($.inArray(error, selects) !== -1) {
+				if ($('#customTargetForm select[name='+htmlspecialchars(error)+']').val() !== '' || changeTestButton) {
+					$('#customTargetForm select[name='+htmlspecialchars(error)+']').addClass('error')
+					.after('<br/><br/><small class="error">'+htmlspecialchars(data.errors[error])+'</small>');
 				}
-			} else if ($.inArray(value, inputs) !== -1) {
-				if ($('#customTargetForm input[name='+htmlspecialchars(value)+']').val() !== '' || changeTestButton) {
-					$('#customTargetForm input[name='+htmlspecialchars(value)+']').addClass('error')
-					.after('<small class="error">'+htmlspecialchars(data.errors[value])+'</small>');
+			} else if ($.inArray(error, inputs) !== -1) {
+				if ($('#customTargetForm input[name='+htmlspecialchars(error)+']').val() !== '' || changeTestButton) {
+					$('#customTargetForm input[name='+htmlspecialchars(error)+']').addClass('error')
+					.after('<small class="error">'+htmlspecialchars(data.errors[error])+'</small>');
 				}
-			} else if ($.inArray(value, textareas) !== -1) {
-				if ($('#customTargetForm textarea[name='+htmlspecialchars(value)+']').val() !== '' || changeTestButton) {
-					$('#customTargetForm textarea[name='+htmlspecialchars(value)+']').addClass('error')
-					.after('<small class="error">'+htmlspecialchars(data.errors[value])+'</small>');
+			} else if ($.inArray(error, textareas) !== -1) {
+				if ($('#customTargetForm textarea[name='+htmlspecialchars(error)+']').val() !== '' || changeTestButton) {
+					$('#customTargetForm textarea[name='+htmlspecialchars(error)+']').addClass('error')
+					.after('<small class="error">'+htmlspecialchars(data.errors[error])+'</small>');
 				}
 			}
 		}
 	}
 	
+	// Change buttons
 	if(typeof data.errors !== 'undefined' && data.errors !== null) {
 		if (changeTestButton) {
-			$('#test').addClass('alert');
+			$('#test').addClass('alert').html('Failed');
 		}
 		$('#nextbutton').addClass('disabled').addClass('secondary');
 	} else {
 		if (changeTestButton) {
-			$('#test').addClass('success');
+			$('#test').addClass('success').html('Passed');
 		}
 		$('#nextbutton').removeClass('disabled').removeClass('secondary');
 	}
+	
+	// After validation, the form is rebuild and possibly other values are loaded, do the instance suggestion...
+	makeSuggestionInstance();
+	
+	// Stop changing the test button...
 	changeTestButton = false;
 }
 
+// This removes all but the focussed field
 function removeFields(element, fields) {
+	// Remove around the field
 	if (element.length !== 0 && element.attr('name') in fields) {
 		if ($.inArray(element.attr('name'), selects) !== -1) {
 			selects = [ element.attr('name') ];
@@ -207,6 +290,7 @@ function removeFields(element, fields) {
 		
 		$('#customTargetForm label, #customTargetForm select[name!='+element.attr('name')+'], #customTargetForm input[name!='+element.attr('name')+'], #customTargetForm textarea[name!='+element.attr('name')+'], #customTargetForm br, #customTargetForm small').remove();
 
+		// If this is the selected field, remove all attributes, but name(for selecting it in the first place) and type.
 		removeAttribute = [];
 		for (var i = 0; i < element.get(0).attributes.length; i++) {
 			var attrib = element.get(0).attributes[i];
@@ -218,6 +302,7 @@ function removeFields(element, fields) {
 		for (i in removeAttribute) {
 			element.removeAttr(removeAttribute[i]);
 		}
+	// Build 
 	} else {
 		selects = [];
 		inputs = [];
@@ -226,8 +311,12 @@ function removeFields(element, fields) {
 	}
 }
 
+// Adds a basic field
+// before element if element is supply and prepend is true
+// or else prepanded in customTargetForm div.
 function createTextField(name, field, prepend, element) {
 	var input;
+	// Add the basic element
 	if ($('#customTargetForm input[name='+htmlspecialchars(name)+']').length === 0) {
 		if (typeof field.type !== 'undefined' && typeof field.label !== 'undefined') {
 			input = $('<label>'+htmlspecialchars(field.label)+'</label>'+"\n"+'<input type="'+htmlspecialchars(field.type)+'" name="'+htmlspecialchars(name)+'" />');
@@ -247,6 +336,7 @@ function createTextField(name, field, prepend, element) {
 			ajaxFormValidate();
 		});
 		inputs.push(htmlspecialchars(name));
+	// Re-add the label
 	} else {
 		input = $('#customTargetForm input[name='+htmlspecialchars(name)+']');
 		if (typeof field.label !== 'undefined') {
@@ -254,6 +344,7 @@ function createTextField(name, field, prepend, element) {
 		}
 	}
 	
+	// Add all other attributes
 	for(var attr in field) {
 		if (attr !== "type" && attr !== "label") {
 			input.attr(attr, field[attr]);
@@ -261,8 +352,12 @@ function createTextField(name, field, prepend, element) {
 	}
 }
 
+// Adds a textarea
+// before element if element is supply and prepend is true
+// or else prepanded in customTargetForm div.
 function createTextarea(name, field, prepend, element) {
 	var textarea;
+	// Add the basic element
 	if ($('#customTargetForm textarea[name='+htmlspecialchars(name)+']').length === 0) {
 		if (typeof field.label !== 'undefined') {
 			textarea = $('<label>'+htmlspecialchars(field.label)+'</label>'+"\n"+'<textarea name="'+htmlspecialchars(name)+'" />');
@@ -278,6 +373,7 @@ function createTextarea(name, field, prepend, element) {
 			ajaxFormValidate();
 		});
 		textareas.push(htmlspecialchars(name));
+	// Re-add the label
 	} else {
 		textarea = $('#customTargetForm textarea[name='+htmlspecialchars(name)+']');
 		if (typeof field.label !== 'undefined') {
@@ -285,6 +381,7 @@ function createTextarea(name, field, prepend, element) {
 		}
 	}
 	
+	// Add all other attributes
 	for(var attr in field) {
 		if (attr !== "type" && attr !== 'label') {
 			textarea.attr(attr, field[attr]);
@@ -292,8 +389,12 @@ function createTextarea(name, field, prepend, element) {
 	}
 }
 
+// Adds a select
+// before element if element is supply and prepend is true
+// or else prepanded in customTargetForm div.
 function createSelect(name, field, prepend, element) {
 	var select
+	// Add the basic element
 	if ($('#customTargetForm select[name='+htmlspecialchars(name)+']').length === 0) {
 		if (typeof field.label !== 'undefined') {
 			select = $('<label>'+htmlspecialchars(field.label)+'</label>'+"\n"+'<select name="'+htmlspecialchars(name)+'" />');
@@ -309,6 +410,7 @@ function createSelect(name, field, prepend, element) {
 			ajaxFormValidate();
 		});
 		selects.push(htmlspecialchars(name));
+	// Re-add the label
 	} else {
 		select = $('#customTargetForm select[name='+htmlspecialchars(name)+']');
 		if (typeof field.label !== 'undefined') {
@@ -316,6 +418,7 @@ function createSelect(name, field, prepend, element) {
 		}
 	}
 	
+	// Add all other attributes
 	for(var attr in field) {
 		if (attr !== "type" && attr !== 'content' && attr !== 'placeholder' && attr !== 'label') {
 			select.attr(attr, field[attr]);
@@ -323,6 +426,8 @@ function createSelect(name, field, prepend, element) {
 			select.append($("<option></option>").text(field[attr]));
 		}
 	}
+	
+	// Add the options in of the select
 	if (typeof field.content !== 'undefined') {
 		if (typeof field.content !== 'undefined') {
 			$('#customTargetForm select[name='+htmlspecialchars(name)+'] option:gt(0)').remove();
@@ -335,6 +440,7 @@ function createSelect(name, field, prepend, element) {
 	}
 }
 
+// Returns all values from the form
 function getFormdata() {
 	var data=new Object();
 	for(var i in selects)
@@ -342,14 +448,14 @@ function getFormdata() {
 		data[selects[i]] = $("#targetForm select[name="+htmlspecialchars(selects[i])+"] option:selected").val();
 	}
 	
-	for(var i in inputs)
+	for(var j in inputs)
 	{
-		data[inputs[i]] = $("#targetForm input[name="+htmlspecialchars(inputs[i])+"]").val();
+		data[inputs[j]] = $("#targetForm input[name="+htmlspecialchars(inputs[j])+"]").val();
 	}
 	
-	for(var i in textareas)
+	for(var k in textareas)
 	{
-		data[textareas[i]] = $("#targetForm textarea[name="+htmlspecialchars(textareas[i])+"]").val();
+		data[textareas[k]] = $("#targetForm textarea[name="+htmlspecialchars(textareas[k])+"]").val();
 	}
 	
 	data.serverId = $("#targetForm select[name=serverId]").val();
@@ -358,16 +464,44 @@ function getFormdata() {
 	return data;
 }
 
+// Changes the test button and does other calls that are appropiate
+function onChangeInstance() {
+	if ($('select[name=instance]').val() == '') {
+		$('#test').html('Test').removeClass('secondary').removeClass('success').removeClass('alert').removeAttr("disabled").removeClass('disabled');
+	} else {
+		ajaxFormValidate();
+	}
+	hideTargetForm();
+}
+
+// Hide the remaining target form when an instance is selected
+// otherwise show it all
+function hideTargetForm() {
+	if ($('select[name=instance]').val() != '') {
+		$('.newTarget').hide();
+	} else {
+		$('.newTarget').show();
+	}
+}
+
+// Document on ready...
 $(document).ready(function(){
 	ajaxFormFirstFill();
 	
 	$('select[name=serverId]').change(function(e) {
 		makeSuggestion();
+		allowSuggestedInstances = true;
 	});
+	
+	$('select[name=instance]').change(function(e) {
+		onChangeInstance();
+	});
+	
 	$('input[name=url]').change(function(e) {
 		setRemoteProject();
+		allowSuggestedInstances = true;
 	});
-	$('#targetForm select, #targetForm input, #targetForm textarea').change(function(e) {
+	$('#targetForm select[name=serverId], #targetForm input, #targetForm textarea').change(function(e) {
 		ajaxFormValidate();
 	});
 	$('#test').click(function() {

@@ -4,9 +4,6 @@ $this->headTitle('Files');
 
 // Get the base url, so our application does not need to be at the root location.
 $baseUrl = Zend_Controller_Front::getInstance()->getBaseUrl();
-
-// Append script at the end of the page, like it should
-$this->headScript()->appendFile($baseUrl . '/javascripts/index/requiredselect.js');
 ?>
 <div class="row">
 	<div class="twelve columns">
@@ -49,7 +46,7 @@ $this->headScript()->appendFile($baseUrl . '/javascripts/index/requiredselect.js
 			<span class="has-tip tip-top" title="Review database schema changes"><a href="<?php echo $this->url(array('module' => 'default', 'controller' => 'upgrade', 'action' => 'database'), null, true); ?>" class="button">&Lt; Previous</a></span>
 		</div>
 		<div class="six columns" align="right">
-			<span class="has-tip tip-top" title="Begin deployment"><input type="submit" id="nextbutton" class="secondary disabled button" value="Start &Gt;" /></span>
+			<span class="has-tip tip-top" title="Begin deployment"><input type="submit" id="nextbutton" class="button" value="Start &Gt;" /></span>
 		</div>
 	</div>
 </form>

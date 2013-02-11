@@ -6,7 +6,7 @@ $this->headTitle('Welcome');
 $baseUrl = Zend_Controller_Front::getInstance()->getBaseUrl();
 
 // Append script at the end of the page, like it should
-$this->headScript()->appendFile($baseUrl . '/javascripts/index/requiredselect.js');
+$this->headScript()->appendFile($baseUrl . '/javascripts/index/required.js');
 ?>
 <div class="row">
 	<div class="twelve columns">
@@ -19,7 +19,7 @@ $this->headScript()->appendFile($baseUrl . '/javascripts/index/requiredselect.js
 	<div class="row">
 		<div class="twelve columns">
 			<label>Recipe</label>
-			<select id="required" name="recipe" class="twelve columns">
+			<select name="recipe" class="twelve columns required">
 				<option value="">Select a recipe&hellip;</option>
 				<?php foreach ($this->recipes as $recipe): ?>
 					<option <?php echo ($recipe->getPath() == $this->recipePath) ? 'selected="selected" ' : '' ;?>value="<?php echo $this->escape($recipe->getFileName()); ?>"><?php echo $this->escape($recipe->getName()); ?></option>

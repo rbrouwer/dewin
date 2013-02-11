@@ -6,27 +6,39 @@ $this->headTitle('Application');
 $baseUrl = Zend_Controller_Front::getInstance()->getBaseUrl();
 
 // Append script at the end of the page, like it should
-$this->headScript()->appendFile($baseUrl . '/javascripts/index/requiredselect.js');
+$this->headScript()->appendScript('callbackurlInstance = "' . $this->callbackUrl . '";', 'text/javascript', array('noescape' => true));
+$this->headScript()->appendFile($baseUrl . '/javascripts/index/required.js');
+$this->headScript()->appendFile($baseUrl . '/javascripts/index/source.js');
 ?>
 <div class="row">
 	<div class="twelve columns">
 		<h4>Application</h4>
-		<p>Select the application you wish to deploy</p>
-		<p>Here you see all applications found on the development server that can be deployed by the selected recipe.</p>
+		<p>Select the instance you wish to deploy</p>
 	</div>
 </div>
 <form method="POST" action="<?php echo $this->url(array('module' => 'default', 'controller' => 'index', 'action' => 'application'), null, true); ?>">
 	<div class="row">
 		<div class="twelve columns">
-			<label>Application</label>
-			<select id="required" name="application" class="twelve columns">
+			<label>Server:</label>
+			<select name="serverId" class="twelve columns required">
+				<option value="">Select a server&hellip;</option>
+				<?php foreach ($this->servers as $id => $server): ?>
+						<option <?php echo ($this->server !== null && $server->id == $this->server->id) ? 'selected="selected" ' : '' ;?>value="<?php echo $this->escape($server->id); ?>"><?php echo $this->escape($server->name); ?></option>
+				<?php endforeach; ?>
+			</select><br/><br/>
+			<label>Application:</label>
+			<select name="instance" class="twelve columns required">
 				<option value="">Select an application&hellip;</option>
-				<?php foreach ($this->applications as $dev => $applications): ?>
-					<optgroup label="<?php echo $this->escape($dev); ?>">
-						<?php foreach ($applications as $application): ?>
-						<option <?php echo ($application->path == $this->selectedPath) ? 'selected="selected" ' : '' ;?>value="<?php echo $this->escape($application->path); ?>"><?php echo $this->escape($application->getName()); ?></option>
+				<?php foreach ($this->instances as $label => $serverinstance): ?>
+				<?php if (is_array($serverinstance)):?>
+					<optgroup label="<?php echo $this->escape($label); ?>">
+						<?php foreach ($serverinstance as $instance): ?>
+						<option <?php echo ($instance->id == $this->instance->id && $instance->box()->identifier == $this->instance->identifier) ? 'selected="selected" ' : '' ;?>value="<?php echo ($instance->id != 0) ? $this->escape($instance->id) : $this->escape($instance->box()->identifier); ?>"><?php echo $this->escape($instance->getName()); ?></option>
 						<?php endforeach; ?>
 					</optgroup>
+				<?php else: ?>
+					<option <?php echo ($serverinstance->id == $this->instance->id && $serverinstance->box()->identifier == $this->instance->identifier) ? 'selected="selected" ' : '' ;?>value="<?php echo ($serverinstance->id != 0) ? $this->escape($serverinstance->id) : $serverinstance->identifier; ?>"><?php echo $this->escape($serverinstance->getName()); ?></option>
+				<?php endif; ?>
 				<?php endforeach; ?>
 			</select>
 		</div>

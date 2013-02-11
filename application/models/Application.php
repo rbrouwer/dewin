@@ -20,4 +20,8 @@ class Model_Application extends RedBean_SimpleModel {
 		$a = explode('/', $this->path);
 		return $a[(count($a) - 1)];
 	}
+	
+	public function update() {
+		unset($this->uniqueIdentifier);
+	}
 }

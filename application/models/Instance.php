@@ -3,6 +3,13 @@
 class Model_Instance extends RedBean_SimpleModel {
 
 	/**
+	 * An identifier created by a server, allowing a server to have non-existent instances.
+	 * This is needed to create new instances on the fly. 
+	 * @var String
+	 */
+	public $identifier;
+	
+	/**
 	 * Contains all values for which no columns exist.
 	 * @var array 
 	 */
@@ -152,6 +159,16 @@ class Model_Instance extends RedBean_SimpleModel {
 			return $this->bean->$property;
 		}
 	}
+	
+	public function getName() {
+		$server = $this->bean->server;
+		if ($server instanceof RedBean_OODBBean && $server->getMeta('type') === 'server') {
+			return $server->box()->getInstanceName($this);
+		} elseif($server instanceof Model_Server) {
+			return $server->getInstanceName($this);
+		}
+		return 'N/A';
+	}
 
 	/**
 	 * Gets all properties of this instance
@@ -204,6 +221,40 @@ class Model_Instance extends RedBean_SimpleModel {
 	public function isDeployed() {
 		$deployment = R::findOne('deployment', ' target_id = ? AND success = 1 AND type = ? ', array($this->id, 'deploy'));
 		return ($deployment !== null || $this->bean->server_id == '1');
+	}
+	
+	public function getFilesystem() {
+		$server = $this->server;
+		if ($server->access === 'local') {
+			$filesystem = new Model_Filesystem_Local($this->box()->webroot);
+		} elseif ($server->access === 'remote') {
+
+			if (isset($this->box()->host)) {
+				$host = $this->box()->host;
+			} elseif (isset($server->host)) {
+				$host = $server->host;
+			} else {
+				$host = null;
+			}
+
+			if (isset($this->box()->user)) {
+				$user = $this->box()->user;
+			} elseif (isset($server->user) && !empty($server->user)) {
+				$user = $server->user;
+			} elseif (isset($server->cpu) && !empty($server->cpu)) {
+				$user = $server->cpu;
+			} else {
+				$user = null;
+			}
+
+			if (isset($this->box()->password)) {
+				$password = $this->box()->password;
+			} else {
+				$password = null;
+			}
+			$filesystem = new Model_Filesystem_Sftp($host, $user, $this->box()->webroot, $password);
+		}
+		return $filesystem;
 	}
 
 }

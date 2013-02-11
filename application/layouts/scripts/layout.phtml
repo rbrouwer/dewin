@@ -51,10 +51,10 @@ $this->headMeta()->prependHttpEquiv('Content-Type', 'text/html; charset=UTF-8');
 		  <section>
 			  <ul class="right">
 				  <?php if (Zend_Auth::getInstance()->hasIdentity()): ?>
-					  <li><a href="<?php echo $this->url(array('module' => 'default', 'controller' => 'snapshot', 'action' => 'index'), null, false); ?>">Snapshot</a></li>
+					  <!--li><a href="<?php echo $this->url(array('module' => 'default', 'controller' => 'snapshot', 'action' => 'index'), null, false); ?>">Snapshot</a></li-->
 					  <li><a href="<?php echo $this->url(array('module' => 'default', 'controller' => 'rollback', 'action' => 'index'), null, false); ?>">Rollback</a></li>
 					  <li><a href="http://wiki.online.schuttelaar.nl/index.php?title=Deployment" target="_blank">Help</a></li>
-					  <li><a href="#">Logs</a></li>
+					  <!--li><a href="#">Logs</a></li-->
 					  <li><a href="<?php echo $this->url(array('module' => 'default', 'controller' => 'authentication', 'action' => 'logout'), null, false); ?>">Logout(<?php echo $this->escape(ucfirst(Zend_Auth::getInstance()->getIdentity())) ?>)</a></li>
 				  <?php endif; ?>
 			  </ul>

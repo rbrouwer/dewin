@@ -34,17 +34,42 @@ class Zend_View_Helper_LinearPath extends Zend_View_Helper_Abstract {
 		if ($current === false) {
 			$output = '<li class="unavailable"><span>Unavailable</span></li>';
 		} else {
+			$favInfo = $this->readSessionForBookmark();
+			
 			$i = 0;
 			foreach ($actions as $currentActionName => $currentActionTitle) {
+				$output .= '<li';
 				if ($i < $current) {
-					$output .= '<li><span>' . $this->view->escape($currentActionTitle) . '</span></li>';
+					$output .= '><span>' . $this->view->escape($currentActionTitle) . '</span>';
 				} elseif ($i === $current) {
-					$output .= '<li class="current"><span>' . $this->view->escape($currentActionTitle) . '</span></li>';
+					$output .= ' class="current"><span>' . $this->view->escape($currentActionTitle) . '</span>';
 				} else {
-					$output .= '<li class="unavailable"><span>' . $this->view->escape($currentActionTitle) . '</span></li>';
+					$output .= ' class="unavailable"><span>' . $this->view->escape($currentActionTitle) . '</span>';
 				}
+				if ($currentActionName === 'index->detection' && $favInfo !== null) {
+					$baseUrl = Zend_Controller_Front::getInstance()->getBaseUrl();
+					$output .= ' <span class="has-tip tip-bottom" title="Bookmark these deployment settings" style="padding-left: 0px;"><a rel="bookmark" onclick="return false;" href="'.$this->view->url(array_merge(array('module' => 'default', 'controller' => 'index', 'action' => 'bookmark'), $favInfo), null, true).'"><img src="'.$baseUrl.'/images/star.png" alt="Dewin - Bookmark" /></a></span>';
+				}
+				$output .= '</li>';
 				$i++;
 			}
+		}
+		return $output;
+	}
+	
+	public function readSessionForBookmark() {
+		$d = new Zend_Session_Namespace('d');
+		$output = array();
+		if (isset($d->model)) {
+			if ($d->model->box()->source !== null && $d->model->box()->source->id != 0) {
+				$output['source'] = $d->model->box()->source->id;
+			}
+			if ($d->model->box()->remote !== null && $d->model->box()->remote->id != 0) {
+				$output['target'] = $d->model->box()->target->id;
+			}
+		}
+		if (count($output) !== 2) {
+			$output = null;
 		}
 		return $output;
 	}

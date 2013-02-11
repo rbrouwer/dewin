@@ -6,10 +6,13 @@ $this->headTitle('Recipe');
 $baseUrl = Zend_Controller_Front::getInstance()->getBaseUrl();
 
 // Append script at the end of the page, like it should
-$this->headScript()->appendFile($baseUrl . '/javascripts/index/requiredcheckbox.js');
+$this->headScript()->appendFile($baseUrl . '/javascripts/index/required.js');
 ?>
 <div class="row">
 	<div class="twelve columns">
+		<?php if ($this->recipe->getDebugMode() > 0):?>
+		<div class="alert-box alert">This recipe is in debug mode.</div>
+		<?php endif; ?>
 		<h4>Recipe</h4>
 		<p>Please read the recipe notice. These are a couple of notes attached to the recipe by the author. Please confirm you have read these notices before proceeding.</p>
 	</div>
@@ -45,9 +48,12 @@ $this->headScript()->appendFile($baseUrl . '/javascripts/index/requiredcheckbox.
 </div>
 <div class="row">
 	<div class="twelve columns">
+		<?php if ($this->recipe->getDebugMode() > 0):?>
+		<div class="alert-box alert">This recipe is in debug mode.</div>
+		<?php endif; ?>
 		<form>
-			<label for="required">
-				<input id="required" name="Agree" value="agree" type="checkbox" /> I have read this notice.
+			<label for="checkbox">
+				<input id="checkbox" class="required" name="Agree" value="agree" type="checkbox" /> I have read this notice.
 			</label>
 		</form>
 	</div>

@@ -18,6 +18,7 @@ $this->headScript()->appendFile($baseUrl . '/javascripts/index/logs.js');
 		<ul>
 			<li>You can <a href="<?php echo $this->escape($this->url); ?>" target="_blank">visit the application</a>.</li>
 			<li>You can <span class="showInformation" style="color:#2BA6CB; cursor: pointer;">review the logs of the deployment</span>.</li>
+			<li>You can make <a rel="bookmark" onclick="return false;" href="<?php echo $this->url(array('module' => 'default', 'controller' => 'index', 'action' => 'bookmark', 'source' => $this->source_id, 'target' => $this->target_id), null, true); ?>" target="_blank">a bookmark</a> which allows even quicker deployments of this application.</li>
 		</ul>
 	</div>
 </div>

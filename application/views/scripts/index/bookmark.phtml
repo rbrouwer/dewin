@@ -1,0 +1,25 @@
+<?php
+//Set page title
+$this->headTitle('Bookmark');
+
+?>
+<div class="row">
+	<div class="twelve columns">
+		<h4>Bookmark</h4>
+		<p>A deployment is still active. Would you like to overwrite that?</p>
+		<p>Overwriting a deployment will not harm the deployment itself, you just will not be able to see the result. If a deployment is overwritten during certain stage, temporary files might not be cleaned up. <!-- Currently this tool does not clean up AT ALL! --></p>
+	</div>
+</div>
+<form method="POST" action="<?php echo $this->url(array('module' => 'default', 'controller' => 'index', 'action' => 'bookmark'), null, true); ?>">
+	<input type="hidden" name="source" value="<?php echo $this->escape($this->source); ?>" />
+	<input type="hidden" name="target" value="<?php echo $this->escape($this->target); ?>" />
+	<!-- EasterEgg: Guess what movie is referred to below... -->
+	<div class="row nudgedown">
+		<div class="six columns" align="left">
+			<span class="has-tip tip-right" title="You take the blue pill, the story ends, you wake up in your bed and believe whatever you want to believe."><a href="<?php echo $this->url(array('module' => 'default', 'controller' => 'index', 'action' => 'index'), null, true); ?>" class="button">&Lt; No</a></span>
+		</div>
+		<div class="six columns" align="right">
+			<span class="has-tip tip-left" title="You take the red pill, you stay in Wonderland, and I show you how deep the rabbit hole goes."><input type="submit" id="nextbutton" class="button alert" value="Yes, Overwrite &Gt;" /></span>
+		</div>
+	</div>
+</form>

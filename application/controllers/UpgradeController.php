@@ -145,7 +145,7 @@ class UpgradeController extends Zend_Controller_Action {
 			$fileuploadStrategy = $this->getRequest()->getParam('fileStrat');
 			if ($fileuploadStrategy === 'nobackup') {
 				$d->model->box()->fileuploadStrategy = 'UpgradeQuick';
-				$d->model->rollback = false;
+				$d->model->rollback = 0;
 			} else {
 				$d->model->box()->fileuploadStrategy = 'Upgrade';
 			}
@@ -224,6 +224,11 @@ class UpgradeController extends Zend_Controller_Action {
 		}
 
 		$this->view->url = 'http://' . $d->model->box()->remoteUrl;
+		
+		// Favorites link
+		$this->view->remoteUrl = $d->model->box()->remoteUrl;
+		$this->view->source_id = $d->model->box()->source->id;
+		$this->view->target_id = $d->model->box()->target->id;
 	}
 
 }

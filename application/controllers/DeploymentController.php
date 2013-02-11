@@ -4,6 +4,7 @@ class deploymentController extends Zend_Controller_Action {
 
 	public function init() {
 		/* Initialize action controller here */
+		
 	}
 
 	public function deploymentAction() {
@@ -96,6 +97,11 @@ class deploymentController extends Zend_Controller_Action {
 
 		// Pass the target url to the view.
 		$this->view->url = 'http://' . $d->model->box()->remoteUrl;
+		
+		// Favorites link
+		$this->view->remoteUrl = $d->model->box()->remoteUrl;
+		$this->view->source_id = $d->model->box()->source->id;
+		$this->view->target_id = $d->model->box()->target->id;
 	}
 
 }

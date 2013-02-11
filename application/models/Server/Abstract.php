@@ -61,7 +61,25 @@ abstract class Model_Server_Abstract {
 	 * @param Model_Recipe $recipe The recipe which checks the application before returning it.
 	 * @return array Array with Model_Application
 	 */
-	abstract public function getApplications($recipe = null);
+	abstract public function getInstances($recipe = null);
+	
+	/**
+	 * Get an instance using an indentifier. This allows instances which are not saved 
+	 * in the database to be selected in the application screen.
+	 * @param String $uniqueIdentifier The unique identifier
+	 * @param Model_Recipe $recipe The recipe which checks the application before returning it.
+	 * @return Model_Instances The Model of the Instance.
+	 */
+	abstract public function getInstance($uniqueIdentifier, $recipe = null);
+	
+	
+	/**
+	 * Generates a name for an instance. This could be saved in the instance, 
+	 * but that would mean manually naming all currently existing instances.
+	 * @param Model_Instance $instance The instance to generate a name for.
+	 * @return String The name
+	 */
+	abstract public function getInstanceName(Model_Instance $instance);
 	
 	/**
 	 * Returns the properties of this server
