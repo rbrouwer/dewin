@@ -6,14 +6,43 @@
 class Model_Server_Demo extends Model_Server_Abstract {
 
 	/**
-	 * Lists all applications for that recipe on a demo directadmin server.
-	 * @param Model_Recipe $recipe
-	 * @return array
+	 * Lists all applications for that recipe on that server.
+	 * @param Model_Recipe $recipe The recipe which checks the application before returning it.
+	 * @return array Array with Model_Application
 	 */
-	public function getApplications($recipe = null) {
-		// Get different applications from demo directadmin environment for deployment to prod or dev.
-		// Not needed now.
-		return array();
+	public function getInstances($recipe = null) {
+		if ($recipe === null) {
+			return $this->unbox()->ownInstance;
+		} else {
+			$instances = array();
+			foreach ($this->unbox()->ownInstance as $id => $instance) {
+				if ($instance->getDeploymentRecipe() === $recipe->getPath()) {
+					$instances[$id] = $instance;
+				}
+			}
+			return $instances;
+		}
+	}
+	
+	/**
+	 * Get an instance using an indentifier. This allows instances which are not saved 
+	 * in the database to be selected in the application screen.
+	 * @param String $uniqueIdentifier The unique identifier
+	 * @param Model_Recipe $recipe The recipe which checks the application before returning it.
+	 * @return Model_Instances The Model of the Instance.
+	 */
+	public function getInstance($uniqueIdentifier, $recipe = null) {
+		throw new Exception('This unique Identifier was not created by this server.');
+	}
+
+	/**
+	 * Generates a name for an instance. This could be saved in the instance, 
+	 * but that would mean manually naming all currently existing instances.
+	 * @param Model_Instance $instance The instance to generate a name for.
+	 * @return String The name
+	 */
+	public function getInstanceName(Model_Instance $instance) {
+		return $instance->url;
 	}
 
 	/**
